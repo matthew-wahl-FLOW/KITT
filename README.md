@@ -2,7 +2,7 @@
 Kokanee Integrated Transportation Team - Autonomous Synchronized Railway Network with Integrated Robotic Beverage Distribution
 # Beer Train Automation System
 
-A fully automated model railroad system that delivers ice coldd kokanee via a dedicated DCC-controlled consist.
+A fully automated model railroad system with capacity for delivering single or multiple ice cold kokanees via a dedicated DCC-controlled consist.
 
 This project integrates Raspberry Pi 5, EX-CommandStation (CSB1), EX-RAIL, JMRI, Python, MQTT, and multiple microcontrollers to coordinate train movement, hardware automation, and user interaction.
 
@@ -11,10 +11,10 @@ This project integrates Raspberry Pi 5, EX-CommandStation (CSB1), EX-RAIL, JMRI,
 ## Project Objectives
 
 - Operate multiple DCC locomotives simultaneously on a ~200 ft layout
-- Designate a priority “beer train” with right-of-way handling
-- Automate beer dispensing, loading, transport, and delivery
+- Designate a priority “kokanee train” with right-of-way handling
+- Automate beer dispensing, loading, transport, and delivery. Train cap-acity for multi beer delivery.
 - Provide real-time monitoring of trains, switches, sensors, and hardware
-- Enable ordering via web or desktop interface
+- Enable ordering via web or desktop interface or RFID 
 - Track user consumption and system activity
 
 ---
@@ -40,7 +40,7 @@ This project integrates Raspberry Pi 5, EX-CommandStation (CSB1), EX-RAIL, JMRI,
 
 - EX-RAIL runs on the CSB1 and executes deterministic train movements
 - JMRI manages turnouts, sensors, panels, and high-level layout state
-- Python on the Raspberry Pi:
+- Python on the Raspberry Pi 5:
   - Orchestrates multi-step sequences
   - Validates safety and readiness conditions
   - Coordinates microcontrollers via MQTT
