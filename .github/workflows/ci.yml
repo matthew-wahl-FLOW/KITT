@@ -1,0 +1,4 @@
+# // CI pipeline (comment stub)
+# // Steps: checkout, setup Python, install deps, lint, run unit tests
+# // Optional: build firmware sketches via PlatformIO if configured
+# // Add secrets and runners as needed
