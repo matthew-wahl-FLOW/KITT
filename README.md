@@ -68,3 +68,76 @@ The orchestrator never assumes success without explicit confirmation.
 ---
 
 ## Repository Structure
+
+.github/     — Repository policies and automation (CI, checks)
+deploy/      — OS-level installation assets (systemd, udev, installers)
+docs/        — Architecture, design notes, and specifications
+firmware/    — Microcontroller firmware for mechanical subsystems
+hardware/    — Mechanical and electrical design artifacts
+jmri/        — JMRI profiles, scripts, and layout logic
+services/    — Raspberry Pi orchestration and support services
+tests/       — Simulation, validation, and safety tests
+webapp/      — User interface and monitoring components
+
+### Key Directories Explained
+
+#### `deploy/`
+Canonical deployment definitions:
+- systemd unit files
+- udev rules
+- MQTT configuration snippets
+- install/uninstall scripts
+
+Nothing in this directory runs directly; it must be explicitly installed into the OS.
+
+#### `services/`
+Python and supporting services that:
+- Coordinate subsystems
+- Enforce high-level safety logic
+- Interface with JMRI and MQTT
+
+These services authorize actions but never directly actuate hardware.
+
+#### `jmri/`
+JMRI configuration, panels, and scripts used for:
+- Layout state
+- Turnouts
+- Sensors
+- Integration with EX‑CommandStation
+
+#### `firmware/`
+Microcontroller code responsible for:
+- Physical motion
+- Sensor polling
+- Hardware safety enforcement
+
+Subsystems reject unsafe commands locally.
+
+---
+
+## Safety Model
+
+- Hardware safety overrides software
+- Microcontrollers enforce physical limits
+- Loss of communication defaults to a safe state
+- Trains cannot enter unsafe track sections
+- Mechanical motion requires verified preconditions
+
+No single software failure can trigger unsafe motion.
+
+---
+
+## Current Development Status
+
+- Repository is under active architectural development
+- Deployment and service scaffolding exists
+- Hardware integration is phased
+- System is designed to scale in layout size, complexity, and contributors
+
+See `docs/` for detailed specifications.
+
+---
+
+## License
+
+MIT License. See `LICENSE`.
