@@ -237,4 +237,5 @@ hardware/export/
 
 .idea/
 .vscode/
+.vs/
 *.code-workspace
