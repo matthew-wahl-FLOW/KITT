@@ -1,0 +1,43 @@
+# PURPOSE:
+#   Runs the Python orchestration layer on the Pi.
+# STEPS:
+# - Wait for network-online so MQTT and remote subsystems are reachable.
+# - Load environment variables from /etc/kitt/kitt.env.
+# - Run from /opt/kitt/src/orchestrator (your code location).
+# - Restart on failure with short delay.
+# - Apply basic service hardening.
+
+[Unit]
+Description=KITT Orchestrator (Pi coordinator)
+After=network-online.target kitt-mqtt.service
+Wants=network-online.target kitt-mqtt.service
+PartOf=kitt.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/kitt/src/orchestrator
+EnvironmentFile=/etc/kitt/kitt.env
+# ExecStart: call your real entrypoint module/script when implemented
+# ExecStart=/usr/bin/python3 -m kitt_orchestrator
+# PSEUDOCODE:
+# - initialize logging
+# - connect to MQTT broker using env vars
+# - subscribe to command topics
+# - publish heartbeat
+# - coordinate with JMRI/EX-RAIL via defined interfaces
+# - enforce "authorize, don't directly actuate" constraint
+
+Restart=on-failure
+RestartSec=2
+
+# Hardening (adjust later as needed)
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=kitt.target
+``

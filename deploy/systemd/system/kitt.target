@@ -1,0 +1,15 @@
+# PURPOSE:
+#   A logical target to group all KITT services so they can be
+#   enabled/started/stopped as a unit if desired.
+# STEPS:
+# - Provide a target that other KITT services can "WantedBy".
+# - No ExecStart; targets just group dependencies.
+
+[Unit]
+Description=KITT System Aggregate Target
+# Optionally ensure network is available before this target is considered reached
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target

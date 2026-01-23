@@ -1,0 +1,19 @@
+# PURPOSE:
+#   Document the intended on-disk layout after installation.
+#
+# /opt/kitt/
+#   src/                 ← application source (orchestrator, camera, health, jmri scripts)
+#   venv/                ← optional Python virtualenv (if you choose to use one)
+#
+# /etc/kitt/
+#   kitt.env             ← runtime environment vars (from kitt.env.example)
+#   mosquitto.env        ← optional mosquitto env (from mosquitto.env.example)
+#
+# /var/lib/kitt/
+#   state/               ← orchestrator state, caches
+#   metrics/             ← health snapshots
+#
+# /var/log/kitt/
+#   orchestrator.log
+#   camera.log
+#   health.log

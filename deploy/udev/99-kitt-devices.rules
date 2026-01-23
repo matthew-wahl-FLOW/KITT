@@ -1,0 +1,21 @@
+# PURPOSE:
+#   Provide stable device names and permissions for serial devices, cameras, sensors, etc.
+# STEPS:
+# - Match devices by vendor/product/serial.
+# - Create persistent symlinks under /dev/kitt/*.
+# - Adjust MODE/GROUP so the service user (pi) can access without root.
+#
+# EXAMPLES (pseudocode; replace IDs with real values using `udevadm info -a -n /dev/ttyUSB0`):
+#
+# USB Serial adapter for EX-CommandStation (example IDs):
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="kitt/csb1-serial", MODE="0660", GROUP="dialout"
+#
+# Load cell ADC USB interface (example):
+# SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="0483", SYMLINK+="kitt/scale0", MODE="0660", GROUP="plugdev"
+#
+# CSI/USB Camera (example):
+# SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", SYMLINK+="kitt/cam0", MODE="0660", GROUP="video"
+#
+# After editing:
+#   sudo udevadm control --reload
+#   sudo udevadm trigger

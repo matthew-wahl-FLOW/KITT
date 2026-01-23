@@ -1,0 +1,30 @@
+# PURPOSE:
+#   Health monitor/heartbeat: publishes system status (CPU temp, disk, service states) to MQTT.
+# STEPS:
+# - Start after orchestrator so it can report orchestrator status too (or parallel).
+# - Poll at intervals; publish to a retained topic; expose liveness probes.
+
+[Unit]
+Description=KITT Health & Heartbeat
+After=kitt-orchestrator.service
+Wants=kitt-orchestrator.service
+PartOf=kitt.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/kitt/src/health
+EnvironmentFile=/etc/kitt/kitt.env
+# ExecStart (pseudo):
+# ExecStart=/usr/bin/python3 -m kitt_health
+# PSEUDOCODE:
+# - on start: publish "online" retained message
+# - loop: gather metrics (cpu, mem, disk, temps), ping subsystems, publish JSON
+# - on SIGTERM: publish "offline" retained message
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=kitt.target

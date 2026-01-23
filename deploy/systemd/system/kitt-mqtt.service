@@ -1,0 +1,30 @@
+# PURPOSE:
+#   Optional: supervise a local MQTT broker (e.g., Mosquitto) if you host it on the Pi.
+# STEPS:
+# - Start broker before orchestrator.
+# - Load optional env file for credentials/ports.
+# - Alternatively, disable this unit if using an external broker.
+
+[Unit]
+Description=KITT Local MQTT Broker (Mosquitto)
+After=network-online.target
+Wants=network-online.target
+PartOf=kitt.target
+
+[Service]
+Type=notify
+User=mosquitto
+Group=mosquitto
+EnvironmentFile=/etc/kitt/mosquitto.env
+# ExecStart Example (pseudo)
+# ExecStart=/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+# PSEUDOCODE:
+# - listen on localhost and/or LAN as configured
+# - persist retained messages as configured
+# - write logs to syslog or /var/log/mosquitto
+
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=kitt.target

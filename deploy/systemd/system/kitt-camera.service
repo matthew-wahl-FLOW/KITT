@@ -1,0 +1,32 @@
+# PURPOSE:
+#   Optional: supervise a camera stream/publisher (e.g., from the beer train).
+# STEPS:
+# - Wait for network so stream can be published.
+# - Read camera settings from env.
+# - Start a streaming process (e.g., gstreamer/ffmpeg/websocket) when implemented.
+
+[Unit]
+Description=KITT Camera Stream Service
+After=network-online.target
+Wants=network-online.target
+PartOf=kitt.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/kitt/src/camera
+EnvironmentFile=/etc/kitt/kitt.env
+# ExecStart (pseudo):
+# ExecStart=/usr/bin/python3 -m kitt_camera_stream
+# PSEUDOCODE:
+# - detect camera device
+# - start encoder/streamer
+# - publish stream URL/state to MQTT
+
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=kitt.target
+``

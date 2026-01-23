@@ -1,0 +1,32 @@
+# PURPOSE:
+#   Launch JMRI headless (if you opt to run it under systemd on the Pi).
+# STEPS:
+# - Ensure Java and JMRI are installed in a known path.
+# - Use a dedicated working directory for JMRI profiles/logs.
+# - Start after network so panels/sensors can be published or listened to.
+
+[Unit]
+Description=KITT JMRI Headless
+After=network-online.target
+Wants=network-online.target
+PartOf=kitt.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/opt/kitt/src/jmri
+EnvironmentFile=/etc/kitt/kitt.env
+# ExecStart Example (pseudo)
+# ExecStart=/usr/bin/java -jar /opt/jmri/JMRI.jar -Djmri.log.path=/var/log/kitt/jmri.log
+# PSEUDOCODE:
+# - Load the designated JMRI profile
+# - Initialize connections (e.g., to EX-CommandStation if applicable)
+# - Expose panel states and sensors
+# - Provide script hooks for orchestrator
+
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=kitt.target
