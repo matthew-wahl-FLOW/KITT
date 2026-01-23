@@ -1,83 +1,70 @@
-# KITT
-Kokanee Integrated Transportation Team - Autonomous Synchronized Railway Network with Integrated Robotic Beverage Distribution
-# Beer Train Automation System
 
-A fully automated model railroad system with capacity for delivering single or multiple ice cold kokanees via a dedicated DCC-controlled consist.
+# KITT — Kokanee Integrated Transportation Team
 
-This project integrates Raspberry Pi 5, EX-CommandStation (CSB1), EX-RAIL, JMRI, Python, MQTT, and multiple microcontrollers to coordinate train movement, hardware automation, and user interaction.
+KITT is a distributed automation system that coordinates a DCC‑controlled model railroad and multiple mechanical subsystems to deliver a beverage from a refrigerator to a human-accessible delivery point.
 
----
+The system is designed around clear separation of concerns, deterministic control at the lowest possible layer, and offline-first operation.
 
-## Project Objectives
-
-- Operate multiple DCC locomotives simultaneously on a ~200 ft layout
-- Designate a priority “kokanee train” with right-of-way handling
-- Automate beer dispensing, loading, transport, and delivery. Train cap-acity for multi beer delivery.
-- Provide real-time monitoring of trains, switches, sensors, and hardware
-- Enable ordering via web or desktop interface or RFID 
-- Track user consumption and system activity
+This repository is the authoritative source for system architecture, deployment assets, and all software and firmware components.
 
 ---
 
-## System Architecture Overview
+## System Architecture Summary
 
-### Control Layers
+KITT is composed of four primary layers:
 
-| Layer | Technology |
-|-----|-----------|
-| DCC / Track Control | EX-CSB1 + EX-MotorShield8874 |
-| Train Automation | EX-RAIL |
-| Layout Logic & Panels | JMRI |
-| Orchestration & State Management | Python (Raspberry Pi 5) |
-| Messaging | MQTT |
-| Hardware Control | Microcontrollers (servo motors, sensors, load cells) |
-| User Interface | Web / Desktop application |
-| Vision | Camera mounted on beer train |
+1. **Rail Control (Real‑Time)**
+2. **Automation & Orchestration**
+3. **Distributed Mechanical Subsystems**
+4. **User Interaction & Monitoring**
 
----
+Each layer has a single responsibility and communicates only through explicit interfaces.
 
-## Component Interaction Model
+### Rail Control (EX‑CommandStation)
 
-- EX-RAIL runs on the CSB1 and executes deterministic train movements
-- JMRI manages turnouts, sensors, panels, and high-level layout state
-- Python on the Raspberry Pi 5:
-  - Orchestrates multi-step sequences
-  - Validates safety and readiness conditions
-  - Coordinates microcontrollers via MQTT
-- MQTT provides asynchronous, decoupled communication between:
+- Hardware: EX‑CSB1 + EX‑MotorShield8874
+- Executes EX‑RAIL logic directly on the command station
+- Sole authority for DCC track power and locomotive motion
+- Provides deterministic, real‑time train control
+- No external system performs time‑critical motor control
+
+### Automation & Orchestration (Raspberry Pi)
+
+- Hardware: Raspberry Pi 5
+- Software:
   - Python services
-  - Microcontrollers
-  - User interface components
+  - JMRI
+  - Local MQTT broker
+- Responsibilities:
+  - High‑level sequencing
+  - Safety interlocks via state verification
+  - Authorization of actions
+- Does **not** directly control motors or servos
+- Assumes no real‑time guarantees
 
----
+### Distributed Mechanical Subsystems
 
-## Major Subsystems
+- Implemented on dedicated microcontrollers (e.g., ESP32)
+- Responsibilities:
+  - Local motor/servo control
+  - Limit switch enforcement
+  - Sensor validation
+  - Hardware safety interlocks
+- Execute independent local state machines
+- Accept high‑level commands only
 
-### Train Control
-- Multiple locomotives running in opposing directions
-- Siding-based yielding logic
-- Priority routing for kokanee train by freight and passenger locomotives
-- Priority routing for freight train by passenger locomotive
+### Communication Model
 
-### Beer Dispensing and Loading
-- Order initiation via authenticated user interface or RFID
-- Refrigerator dispenser controlled by a microcontroller and servo
-- Elevator lifts beer to track height
-- Ramp transfers beer to flatcar
-- Load cells confirm presence and removal of beer
+- Transport: local wired/wireless LAN
+- Protocol: MQTT
+- Characteristics:
+  - Asynchronous
+  - Decoupled
+  - Observable
+  - Offline-capable
 
-### Lift Section
-- Track section lowers to waist height for delivery
-- Position sensors verify lift state
-- Train movement interlocked with lift position
-
-### Verification and Safety
-- IR or optical sensors for precise train positioning
-- RFID or identification system to verify the beer train
-- Load cells to confirm beer handling events
-- Hardware and software interlocks to prevent unsafe operation
+The orchestrator never assumes success without explicit confirmation.
 
 ---
 
 ## Repository Structure
-
