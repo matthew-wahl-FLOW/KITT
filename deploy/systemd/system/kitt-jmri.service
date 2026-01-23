@@ -1,32 +1,47 @@
-# PURPOSE:
-#   Launch JMRI headless (if you opt to run it under systemd on the Pi).
-# STEPS:
-# - Ensure Java and JMRI are installed in a known path.
-# - Use a dedicated working directory for JMRI profiles/logs.
-# - Start after network so panels/sensors can be published or listened to.
 
 [Unit]
-Description=KITT JMRI Headless
-After=network-online.target
+Description=KITT JMRI (Headless PanelPro)
+After=network-online.target mosquitto.service
 Wants=network-online.target
 PartOf=kitt.target
+
+# Optional: if your EX-CommandStation is reachable only after it boots on LAN,
+# keep network-online to ensure DHCP/links are ready.
 
 [Service]
 Type=simple
 User=pi
 Group=pi
-WorkingDirectory=/opt/kitt/src/jmri
+# Set a stable working dir where JMRI is installed
+WorkingDirectory=/opt/jmri
+
+# Headless rendering flag for Java-based apps
+Environment=JAVA_TOOL_OPTIONS=-Djava.awt.headless=true
+
+# Optional: KITT env (e.g., broker host if not localhost)
 EnvironmentFile=/etc/kitt/kitt.env
-# ExecStart Example (pseudo)
-# ExecStart=/usr/bin/java -jar /opt/jmri/JMRI.jar -Djmri.log.path=/var/log/kitt/jmri.log
-# PSEUDOCODE:
-# - Load the designated JMRI profile
-# - Initialize connections (e.g., to EX-CommandStation if applicable)
-# - Expose panel states and sensors
-# - Provide script hooks for orchestrator
+
+# ---- ExecStart options ----
+# Choose ONE of the following ExecStart forms:
+
+# (A) If you have the PanelPro launcher script in /opt/jmri:
+# ExecStart=/opt/jmri/PanelPro --no-splash --profile KITT
+
+# (B) Generic Java invocation (if you know the PanelPro jar path):
+# ExecStart=/usr/bin/java -Djava.awt.headless=true -jar /opt/jmri/lib/PanelPro.jar --profile KITT
+
+# (C) Wrapper script (recommended if your paths/settings vary):
+# ExecStart=/opt/kitt/src/jmri/run_headless.sh
+
+# --- pick A, B, or C, then remove the others. ---
 
 Restart=on-failure
 RestartSec=3
+# Hardening (tune as needed)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
 
 [Install]
 WantedBy=kitt.target
