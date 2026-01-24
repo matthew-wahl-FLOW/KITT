@@ -1,6 +1,9 @@
 
 # KITT — Kokanee Integrated Transportation Team
 
+Simple: High-level overview of the KITT automation system repository.
+Technical: Describes architecture layers, responsibilities, and repository layout.
+
 KITT is a distributed automation system that coordinates a DCC‑controlled model railroad and multiple mechanical subsystems to deliver a beverage from a refrigerator to a human-accessible delivery point.
 
 The system is designed around clear separation of concerns, deterministic control at the lowest possible layer, and offline-first operation.
@@ -141,3 +144,11 @@ See `docs/` for detailed specifications.
 ## License
 
 MIT License. See `LICENSE`.
+
+---
+
+## Missing Info for Further Development
+- **Inputs**: Runtime configuration values and environment requirements.
+- **Outputs**: Expected telemetry and reporting artifacts.
+- **Actions**: Operational runbooks and deployment workflows.
+- **Methods**: Release cadence and ownership model.
