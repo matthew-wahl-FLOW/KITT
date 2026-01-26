@@ -1,7 +1,7 @@
 # JMRI Layout
 
-Simple: Notes for managing JMRI layout files.
-Technical: Defines naming conventions and MQTT mappings for JMRI assets.
+Overview: Notes for managing JMRI layout files.
+Details: Defines naming conventions and MQTT mappings for JMRI assets.
 
 This directory stores JMRI layout files used by PanelPro, including panels and routes.
 

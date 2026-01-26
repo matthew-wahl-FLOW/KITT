@@ -4,6 +4,9 @@
 The webapp provides user-facing ordering and status monitoring. The backend scaffold uses
 only the Python standard library and exposes placeholder HTTP endpoints.
 
+The frontend includes a dashboard stub for the Pi display that renders live sensor readouts
+and MQTT chatter using placeholder data streams.
+
 ## Backend
 - `webapp/backend/api.py` runs a minimal HTTP server.
 - Endpoints: `POST /order`, `GET /trains`.

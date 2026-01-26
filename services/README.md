@@ -9,6 +9,7 @@ current implementations are minimal scaffolds using only the Python standard lib
 - `pi_services/jmri_bridge.py` - JMRI command bridge scaffold.
 - `pi_services/sensor_gateway.py` - Sensor normalization scaffold.
 - `pi_services/loadcell_monitor.py` - Load cell monitoring scaffold.
+- `pi_services/display_dashboard.py` - Pi display dashboard scaffold.
 
 ## Running Locally
 Each module can be executed directly:
@@ -18,6 +19,7 @@ python services/pi_services/train_orchestrator.py
 python services/pi_services/jmri_bridge.py
 python services/pi_services/sensor_gateway.py
 python services/pi_services/loadcell_monitor.py
+python services/pi_services/display_dashboard.py
 ```
 
 ## Missing Info for Further Development

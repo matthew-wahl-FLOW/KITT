@@ -1,5 +1,5 @@
 """Test package.
 
-Simple: Test package marker for discovery.
-Technical: Enables imports in unit and integration tests.
+Overview: Test package marker for discovery.
+Details: Enables imports in unit and integration tests.
 """

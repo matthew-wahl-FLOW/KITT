@@ -1,7 +1,7 @@
 # Test Plan
 
-Simple: Summary of testing phases for KITT components.
-Technical: Defines unit, integration, and hardware test coverage.
+Overview: Summary of testing phases for KITT components.
+Details: Defines unit, integration, and hardware test coverage.
 
 ## Scope
 The test plan covers unit tests for shared utilities, integration tests for service interactions,

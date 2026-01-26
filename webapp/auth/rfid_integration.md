@@ -1,7 +1,7 @@
 # RFID Integration
 
-Simple: Notes on RFID login integration.
-Technical: Defines tag mapping and security expectations.
+Overview: Notes on RFID login integration.
+Details: Defines tag mapping and security expectations.
 
 RFID readers provide a quick login flow for operators using registered tags.
 
