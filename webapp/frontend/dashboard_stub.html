@@ -326,13 +326,21 @@
         element.innerHTML = "";
         if (!entries.length) {
           const row = document.createElement("tr");
-          row.innerHTML = "<td colspan=\"2\">No orders yet</td>";
+          const cell = document.createElement("td");
+          cell.colSpan = 2;
+          cell.textContent = "No orders yet";
+          row.appendChild(cell);
           element.appendChild(row);
           return;
         }
         entries.forEach((entry) => {
           const row = document.createElement("tr");
-          row.innerHTML = `<td>${entry.name}</td><td>${entry.count}</td>`;
+          const nameCell = document.createElement("td");
+          const countCell = document.createElement("td");
+          nameCell.textContent = entry.name;
+          countCell.textContent = entry.count;
+          row.appendChild(nameCell);
+          row.appendChild(countCell);
           element.appendChild(row);
         });
       };

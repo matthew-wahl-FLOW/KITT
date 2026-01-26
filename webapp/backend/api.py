@@ -155,7 +155,10 @@ class ApiHandler(BaseHTTPRequestHandler):
         else:
             return False
 
-        file_path = (FRONTEND_DIR / request_path).resolve()
+        raw_path = FRONTEND_DIR / request_path
+        if raw_path.is_symlink():
+            return False
+        file_path = raw_path.resolve()
         if not (FRONTEND_DIR in file_path.parents or file_path == FRONTEND_DIR):
             return False
         if not file_path.exists() or not file_path.is_file():
