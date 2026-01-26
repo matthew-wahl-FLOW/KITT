@@ -1,7 +1,7 @@
 """Webapp backend API scaffold.
 
-Simple: Provides placeholder HTTP handlers for orders and train status.
-Technical: Minimal stdlib HTTP server with JSON responses and logging.
+Overview: Provides placeholder HTTP handlers for orders and train status.
+Details: Minimal stdlib HTTP server with JSON responses and logging.
 
 Missing info for further development:
 - Inputs: Authentication mechanism, request schemas, user mapping.

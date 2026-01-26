@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """JMRI bridge service.
 
-Simple: Logs incoming command intents destined for JMRI.
-Technical: Placeholder bridge that mirrors commands/events via logging only.
+Overview: Logs incoming command intents destined for JMRI.
+Details: Placeholder bridge that mirrors commands/events via logging only.
 
 Missing info for further development:
 - Inputs: JMRI connection details, command payload schema.

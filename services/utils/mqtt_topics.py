@@ -1,7 +1,7 @@
 """MQTT topic helpers.
 
-Simple: Defines MQTT topic constants used across KITT services.
-Technical: Provides topic templates and formatter helpers for shared MQTT routing.
+Overview: Defines MQTT topic constants used across KITT services.
+Details: Provides topic templates and formatter helpers for shared MQTT routing.
 
 Missing info for further development:
 - Inputs: Broker host/port, retained/QoS rules per topic.
@@ -25,6 +25,7 @@ TRAIN_STATUS = f"{BASE}/train/{{train_id}}/status"
 
 SENSOR_STATE = f"{BASE}/sensor/{{sensor_id}}/state"
 SENSOR_HEALTH = f"{BASE}/sensor/{{sensor_id}}/health"
+SENSOR_READING = f"{BASE}/sensor/{{sensor_id}}/reading"
 
 JMRI_COMMAND = f"{BASE}/jmri/command/{{command}}"
 JMRI_EVENT = f"{BASE}/jmri/event/{{event}}"
@@ -37,6 +38,7 @@ ALL_TOPICS = (
     TRAIN_STATUS,
     SENSOR_STATE,
     SENSOR_HEALTH,
+    SENSOR_READING,
     JMRI_COMMAND,
     JMRI_EVENT,
 )
@@ -77,6 +79,11 @@ def sensor_health_topic(sensor_id: str) -> str:
     return format_topic(SENSOR_HEALTH, sensor_id=sensor_id)
 
 
+def sensor_reading_topic(sensor_id: str) -> str:
+    """Return the topic for sensor reading updates."""
+    return format_topic(SENSOR_READING, sensor_id=sensor_id)
+
+
 def jmri_command_topic(command: str) -> str:
     """Return the topic for JMRI commands."""
     return format_topic(JMRI_COMMAND, command=command)
@@ -97,6 +104,7 @@ def topic_templates() -> Dict[str, str]:
         "TRAIN_STATUS": TRAIN_STATUS,
         "SENSOR_STATE": SENSOR_STATE,
         "SENSOR_HEALTH": SENSOR_HEALTH,
+        "SENSOR_READING": SENSOR_READING,
         "JMRI_COMMAND": JMRI_COMMAND,
         "JMRI_EVENT": JMRI_EVENT,
     }
@@ -111,6 +119,7 @@ __all__ = [
     "TRAIN_STATUS",
     "SENSOR_STATE",
     "SENSOR_HEALTH",
+    "SENSOR_READING",
     "JMRI_COMMAND",
     "JMRI_EVENT",
     "ALL_TOPICS",
@@ -121,6 +130,7 @@ __all__ = [
     "train_status_topic",
     "sensor_state_topic",
     "sensor_health_topic",
+    "sensor_reading_topic",
     "jmri_command_topic",
     "jmri_event_topic",
     "topic_templates",

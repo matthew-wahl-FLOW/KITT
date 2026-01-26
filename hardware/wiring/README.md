@@ -1,7 +1,7 @@
 # Wiring
 
-Simple: Overview of layout wiring guidance.
-Technical: Summarizes wiring conventions and safety considerations.
+Overview: Overview of layout wiring guidance.
+Details: Summarizes wiring conventions and safety considerations.
 
 Wiring guides and connection maps for the physical layout.
 

@@ -1,7 +1,7 @@
 """Integration simulation scaffold for a train run.
 
-Simple: Exercises orchestrator scaffolds with placeholder values.
-Technical: Uses unittest to ensure basic interactions run without errors.
+Overview: Exercises orchestrator scaffolds with placeholder values.
+Details: Uses unittest to ensure basic interactions run without errors.
 
 Missing info for further development:
 - Inputs: Realistic sensor timelines and layout topology.

@@ -1,7 +1,7 @@
 # MQTT Broker Setup
 
-Simple: Minimal Mosquitto setup guide for KITT services.
-Technical: Notes install steps, configuration, and policy expectations.
+Overview: Minimal Mosquitto setup guide for KITT services.
+Details: Notes install steps, configuration, and policy expectations.
 
 Setup notes for running Mosquitto on a Raspberry Pi for the services stack.
 

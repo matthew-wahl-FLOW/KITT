@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Sensor gateway service.
 
-Simple: Normalizes sensor events into standard MQTT topics.
-Technical: Placeholder gateway that logs normalization output.
+Overview: Normalizes sensor events into standard MQTT topics.
+Details: Placeholder gateway that logs normalization output.
 
 Missing info for further development:
 - Inputs: Raw sensor payload formats, validation rules.
