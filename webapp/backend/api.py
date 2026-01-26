@@ -156,7 +156,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             return False
 
         file_path = (FRONTEND_DIR / request_path).resolve()
-        if FRONTEND_DIR not in file_path.parents and file_path != FRONTEND_DIR:
+        if not (FRONTEND_DIR in file_path.parents or file_path == FRONTEND_DIR):
             return False
         if not file_path.exists() or not file_path.is_file():
             return False
