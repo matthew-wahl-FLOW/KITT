@@ -1,7 +1,7 @@
 # Schematics
 
-Simple: Index of hardware schematics.
-Technical: Notes schematic scope, usage, and revision handling.
+Overview: Index of hardware schematics.
+Details: Notes schematic scope, usage, and revision handling.
 
 This folder contains circuit schematics and wiring diagrams for the layout hardware.
 

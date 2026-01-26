@@ -1,115 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KITT Dashboard Stub</title>
-    <style>
-      @font-face {
-        font-family: "D-DIN";
-        src: local("D-DIN"), local("D-DIN Regular"), local("D-DIN-Regular");
-        font-weight: 400;
-        font-style: normal;
-      }
-
-      @font-face {
-        font-family: "D-DIN";
-        src: local("D-DIN Bold"), local("D-DIN-Bold");
-        font-weight: 600;
-        font-style: normal;
-      }
-
-      :root {
-        --kitt-blue: rgb(0, 0, 221);
-        --kitt-gray: rgb(151, 153, 155);
-      }
-
-      body {
-        margin: 0;
-        padding: 32px;
-        font-family: "D-DIN", "DIN", "Arial", sans-serif;
-        color: var(--kitt-gray);
-        background: #ffffff;
-      }
-
-      h1,
-      h2 {
-        margin: 0 0 12px;
-        color: var(--kitt-blue);
-        font-weight: 600;
-      }
-
-      p {
-        margin: 0 0 12px;
-      }
-
-      .grid {
-        display: grid;
-        gap: 16px;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      }
-
-      .panel {
-        border: 1px solid var(--kitt-gray);
-        border-radius: 12px;
-        padding: 16px;
-      }
-
-      .label {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: var(--kitt-blue);
-      }
-
-      .pill {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--kitt-blue);
-        color: var(--kitt-blue);
-        font-size: 0.85rem;
-      }
-
-      .placeholder {
-        margin-top: 12px;
-        padding: 16px;
-        border-radius: 8px;
-        border: 1px dashed var(--kitt-gray);
-        color: var(--kitt-gray);
-        text-align: center;
-        font-size: 0.95rem;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>KITT Operations Dashboard</h1>
-      <p>Live telemetry placeholders for train locations, switches, and orders.</p>
-    </header>
-
-    <section class="grid">
-      <div class="panel">
-        <div class="label">Layout Map</div>
-        <div class="placeholder">Train position map placeholder</div>
-      </div>
-
-      <div class="panel">
-        <div class="label">Active Trains</div>
-        <p class="pill">Train-03 • Moving</p>
-        <div class="placeholder">Train list and switch states</div>
-      </div>
-
-      <div class="panel">
-        <div class="label">Camera Feed</div>
-        <div class="placeholder">Camera iframe placeholder</div>
-      </div>
-
-      <div class="panel">
-        <div class="label">Order Queue</div>
-        <p>Next order: <strong>Delivery A</strong></p>
-        <div class="placeholder">Order form placeholder</div>
-      </div>
-    </section>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>KITT Dashboard Stub</title>
+    </head>
+    <body>
+        <header>
+            <h1>KITT Dashboard Stub</h1>
+            <p>Static placeholders for map, status, switch states, and camera feed.</p>
+        </header>
+        <main>
+            <section>
+                <h2>Track Map</h2>
+                <img src="./images/track_map_placeholder.svg" alt="Track map placeholder" />
+            </section>
+            <section>
+                <h2>Train Status</h2>
+                <img
+                    src="./images/train_status_placeholder.svg"
+                    alt="Train status placeholder"
+                />
+            </section>
+            <section>
+                <h2>Switch Panel</h2>
+                <img
+                    src="./images/switch_panel_placeholder.svg"
+                    alt="Switch panel placeholder"
+                />
+            </section>
+            <section>
+                <h2>Camera Feed</h2>
+                <img
+                    src="./images/camera_feed_placeholder.svg"
+                    alt="Camera feed placeholder"
+                />
+            </section>
+        </main>
+    </body>
 </html>
