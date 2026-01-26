@@ -9,7 +9,9 @@ and MQTT chatter using placeholder data streams.
 
 ## Backend
 - `webapp/backend/api.py` runs a minimal HTTP server.
-- Endpoints: `POST /order`, `GET /trains`.
+- Endpoints: `POST /order`, `GET /trains`, `GET /staff`, `POST /staff`,
+  `GET /leaderboard/weekly`, `GET /leaderboard/all-time`, `POST /leaderboard/record`.
+- Data files live in `webapp/backend/data/` for staff and leaderboard storage.
 
 ## Running Locally
 ```bash

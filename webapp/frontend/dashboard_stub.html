@@ -92,8 +92,22 @@
         font-size: 0.95rem;
       }
 
-      .order-form button {
+      .order-form input[type="text"] + datalist {
+        display: none;
+      }
+
+      .order-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
         margin-top: 6px;
+      }
+
+      .order-actions button {
+        width: 100%;
+      }
+
+      .order-form button {
         padding: 10px 14px;
         border: none;
         border-radius: 8px;
@@ -101,6 +115,29 @@
         color: #fff;
         font-weight: 600;
         cursor: pointer;
+      }
+
+      .order-form button.secondary {
+        background: #edf0f6;
+        color: #1f2a44;
+      }
+
+      .order-status {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #5a6b88;
+      }
+
+      .order-status strong {
+        color: #1f2a44;
+      }
+
+      .order-status.error {
+        color: #c0392b;
+      }
+
+      .leaderboards tbody tr td:last-child {
+        text-align: right;
       }
 
       .leaderboards {
@@ -171,18 +208,35 @@
         <h2>Order Kokanees</h2>
         <form class="order-form">
           <label>
-            User (TBD)
-            <input type="text" name="user" placeholder="Enter name or badge" />
+            User
+            <input
+              type="text"
+              name="user"
+              id="staffName"
+              list="staffList"
+              placeholder="Start typing name"
+              autocomplete="off"
+            />
+            <datalist id="staffList"></datalist>
           </label>
           <label>
             Quantity
-            <input type="number" name="quantity" min="1" placeholder="0" />
+            <input type="number" name="quantity" id="quantity" min="1" placeholder="0" />
           </label>
           <label>
             Delivery Note
             <input type="text" name="note" placeholder="Optional note" />
           </label>
-          <button type="button">Place Order</button>
+          <div class="order-actions">
+            <button type="button" id="placeOrder">Place Order</button>
+            <button type="button" class="secondary" id="confirmDelivery" disabled>
+              Confirm Delivery
+            </button>
+            <button type="button" class="secondary" id="addStaff">
+              Add New Staff Member
+            </button>
+          </div>
+          <div id="orderStatus" class="order-status" aria-live="polite"></div>
         </form>
 
         <div class="leaderboards">
@@ -195,28 +249,7 @@
                   <th>Kokanees</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Alex M.</td>
-                  <td>14</td>
-                </tr>
-                <tr>
-                  <td>Jamie R.</td>
-                  <td>12</td>
-                </tr>
-                <tr>
-                  <td>Priya S.</td>
-                  <td>10</td>
-                </tr>
-                <tr>
-                  <td>Chris L.</td>
-                  <td>9</td>
-                </tr>
-                <tr>
-                  <td>Jordan K.</td>
-                  <td>8</td>
-                </tr>
-              </tbody>
+              <tbody id="weeklyLeaderboard"></tbody>
             </table>
           </section>
 
@@ -229,28 +262,7 @@
                   <th>Kokanees</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Riley T.</td>
-                  <td>128</td>
-                </tr>
-                <tr>
-                  <td>Sam P.</td>
-                  <td>117</td>
-                </tr>
-                <tr>
-                  <td>Casey D.</td>
-                  <td>102</td>
-                </tr>
-                <tr>
-                  <td>Taylor V.</td>
-                  <td>96</td>
-                </tr>
-                <tr>
-                  <td>Morgan B.</td>
-                  <td>88</td>
-                </tr>
-              </tbody>
+              <tbody id="allTimeLeaderboard"></tbody>
             </table>
           </section>
         </div>
@@ -258,43 +270,176 @@
     </main>
 
     <div class="consumed">Kokanee's Consumed: 248</div>
-  </body>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>KITT Dashboard Stub</title>
-    </head>
-    <body>
-        <header>
-            <h1>KITT Dashboard Stub</h1>
-            <p>Static placeholders for map, status, switch states, and camera feed.</p>
-        </header>
-        <main>
-            <section>
-                <h2>Track Map</h2>
-                <img src="./images/track_map_placeholder.svg" alt="Track map placeholder" />
-            </section>
-            <section>
-                <h2>Train Status</h2>
-                <img
-                    src="./images/train_status_placeholder.svg"
-                    alt="Train status placeholder"
-                />
-            </section>
-            <section>
-                <h2>Switch Panel</h2>
-                <img
-                    src="./images/switch_panel_placeholder.svg"
-                    alt="Switch panel placeholder"
-                />
-            </section>
-            <section>
-                <h2>Camera Feed</h2>
-                <img
-                    src="./images/camera_feed_placeholder.svg"
-                    alt="Camera feed placeholder"
-                />
-            </section>
-        </main>
-    </body>
+    <script>
+      const staffInput = document.getElementById("staffName");
+      const staffList = document.getElementById("staffList");
+      const addStaffButton = document.getElementById("addStaff");
+      const placeOrderButton = document.getElementById("placeOrder");
+      const confirmDeliveryButton = document.getElementById("confirmDelivery");
+      const statusMessage = document.getElementById("orderStatus");
+      const quantityInput = document.getElementById("quantity");
+      const weeklyTable = document.getElementById("weeklyLeaderboard");
+      const allTimeTable = document.getElementById("allTimeLeaderboard");
+      let pendingOrder = null;
+
+      const setStatus = (message, isError = false) => {
+        statusMessage.textContent = message;
+        statusMessage.classList.toggle("error", isError);
+      };
+
+      const getStaffRoster = async () => {
+        const response = await fetch("/staff");
+        if (!response.ok) {
+          throw new Error("Unable to load staff roster");
+        }
+        return response.json();
+      };
+
+      const renderStaffOptions = (staff) => {
+        staffList.innerHTML = "";
+        staff.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          staffList.appendChild(option);
+        });
+      };
+
+      const loadStaffRoster = async () => {
+        try {
+          const data = await getStaffRoster();
+          renderStaffOptions(data.staff || []);
+          if (
+            pendingOrder &&
+            !data.staff?.some(
+              (name) => name.toLowerCase() === pendingOrder.user.toLowerCase()
+            )
+          ) {
+            pendingOrder = null;
+            confirmDeliveryButton.disabled = true;
+          }
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      };
+
+      const renderLeaderboard = (element, entries) => {
+        element.innerHTML = "";
+        if (!entries.length) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 2;
+          cell.textContent = "No orders yet";
+          row.appendChild(cell);
+          element.appendChild(row);
+          return;
+        }
+        entries.forEach((entry) => {
+          const row = document.createElement("tr");
+          const nameCell = document.createElement("td");
+          const countCell = document.createElement("td");
+          nameCell.textContent = entry.name;
+          countCell.textContent = entry.count;
+          row.appendChild(nameCell);
+          row.appendChild(countCell);
+          element.appendChild(row);
+        });
+      };
+
+      const loadLeaderboards = async () => {
+        try {
+          const [weeklyResponse, allTimeResponse] = await Promise.all([
+            fetch("/leaderboard/weekly"),
+            fetch("/leaderboard/all-time"),
+          ]);
+          if (!weeklyResponse.ok || !allTimeResponse.ok) {
+            throw new Error("Unable to load leaderboards");
+          }
+          const weeklyData = await weeklyResponse.json();
+          const allTimeData = await allTimeResponse.json();
+          renderLeaderboard(weeklyTable, weeklyData.leaderboard || []);
+          renderLeaderboard(allTimeTable, allTimeData.leaderboard || []);
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      };
+
+      addStaffButton.addEventListener("click", async () => {
+        const name = staffInput.value.trim();
+        if (!name) {
+          setStatus("Enter a name before adding.", true);
+          return;
+        }
+        try {
+          const response = await fetch("/staff", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name }),
+          });
+          if (!response.ok) {
+            throw new Error("Unable to add staff member");
+          }
+          const data = await response.json();
+          renderStaffOptions(data.staff || []);
+          setStatus(`Added ${name} to staff roster.`);
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      placeOrderButton.addEventListener("click", async () => {
+        const user = staffInput.value.trim();
+        const quantity = Number(quantityInput.value);
+        if (!user) {
+          setStatus("Select a user before placing an order.", true);
+          return;
+        }
+        if (!Number.isFinite(quantity) || quantity <= 0) {
+          setStatus("Enter a valid quantity.", true);
+          return;
+        }
+        try {
+          const orderResponse = await fetch("/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user, quantity }),
+          });
+          if (!orderResponse.ok) {
+            throw new Error("Order could not be placed.");
+          }
+          pendingOrder = { user, quantity };
+          confirmDeliveryButton.disabled = false;
+          setStatus(`Order placed for ${user}. Confirm delivery to update leaderboards.`);
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      confirmDeliveryButton.addEventListener("click", async () => {
+        if (!pendingOrder) {
+          setStatus("No pending order to confirm.", true);
+          return;
+        }
+        try {
+          const leaderboardResponse = await fetch("/leaderboard/record", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(pendingOrder),
+          });
+          if (!leaderboardResponse.ok) {
+            throw new Error("Unable to update leaderboards.");
+          }
+          const leaderboardData = await leaderboardResponse.json();
+          renderLeaderboard(weeklyTable, leaderboardData.weekly || []);
+          renderLeaderboard(allTimeTable, leaderboardData.all_time || []);
+          setStatus(`Order delivered for ${pendingOrder.user}.`);
+          pendingOrder = null;
+          confirmDeliveryButton.disabled = true;
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      });
+
+      loadStaffRoster();
+      loadLeaderboards();
+    </script>
 </html>
