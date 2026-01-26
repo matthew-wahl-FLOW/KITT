@@ -1,7 +1,7 @@
 # MQTT Topics
 
-Simple: Reference for KITT MQTT topic naming.
-Technical: Lists topic hierarchy, QoS guidance, and retained message rules.
+Overview: Reference for KITT MQTT topic naming.
+Details: Lists topic hierarchy, QoS guidance, and retained message rules.
 
 ## Overview
 This document defines the MQTT topic hierarchy for KITT. Topics are rooted at `kitt/` and
@@ -15,6 +15,7 @@ use scoped identifiers for orders, trains, sensors, and JMRI bridge commands/eve
 - `kitt/train/{train_id}/status` - Train operational status.
 - `kitt/sensor/{sensor_id}/state` - Normalized sensor state updates.
 - `kitt/sensor/{sensor_id}/health` - Sensor health reports.
+- `kitt/sensor/{sensor_id}/reading` - Detailed sensor readouts for UI/telemetry.
 - `kitt/jmri/command/{command}` - High-level command intents.
 - `kitt/jmri/event/{event}` - JMRI event updates.
 

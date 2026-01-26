@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Train orchestrator service.
 
-Simple: Coordinates train movement requests and publishes command intents.
-Technical: Placeholder CLI service with logging for order/sensor events and routing.
+Overview: Coordinates train movement requests and publishes command intents.
+Details: Placeholder CLI service with logging for order/sensor events and routing.
 
 Missing info for further development:
 - Inputs: Order payload schema, sensor event schema, layout topology data.

@@ -1,5 +1,5 @@
 """Integration tests package.
 
-Simple: Integration test module namespace.
-Technical: Groups integration tests for KITT services.
+Overview: Integration test module namespace.
+Details: Groups integration tests for KITT services.
 """

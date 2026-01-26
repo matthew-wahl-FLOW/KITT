@@ -1,3 +1,149 @@
-<!-- // Dashboard stub showing live train positions, switch states, camera feed placeholder, and order UI -->
-<!-- // Connects to MQTT over WebSocket or backend API for live updates -->
-<!-- // Placeholder UI elements: map, train list, order form, camera iframe -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KITT Live Display</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        padding: 24px;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      section {
+        background: #1e293b;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.4);
+      }
+      h2 {
+        margin-top: 0;
+        font-size: 18px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 6px 4px;
+        border-bottom: 1px solid #334155;
+      }
+      .chatter {
+        height: 180px;
+        overflow-y: auto;
+        background: #0b1220;
+        padding: 8px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+      }
+      .muted {
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>KITT Live Sensor Dashboard</h1>
+        <div class="muted">Pi display view — live readouts and MQTT chatter</div>
+      </div>
+      <div class="muted" id="status">Status: waiting for data…</div>
+    </header>
+    <div class="grid">
+      <section>
+        <h2>Sensor Readouts</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Sensor</th>
+              <th>Value</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="sensor-table"></tbody>
+        </table>
+      </section>
+      <section>
+        <h2>MQTT Chatter</h2>
+        <div class="chatter" id="mqtt-chatter"></div>
+      </section>
+    </div>
+    <section style="margin-top: 20px">
+      <h2>System Summary</h2>
+      <div class="muted" id="summary">No data yet.</div>
+    </section>
+    <script>
+      const sensorTable = document.getElementById("sensor-table");
+      const chatter = document.getElementById("mqtt-chatter");
+      const summary = document.getElementById("summary");
+      const status = document.getElementById("status");
+      const sensors = new Map();
+
+      function renderSensors() {
+        sensorTable.innerHTML = "";
+        Array.from(sensors.values()).forEach((sensor) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${sensor.id}</td><td>${sensor.value}</td><td>${sensor.updated}</td>`;
+          sensorTable.appendChild(row);
+        });
+      }
+
+      function addChatter(message) {
+        const line = document.createElement("div");
+        line.textContent = message;
+        chatter.appendChild(line);
+        chatter.scrollTop = chatter.scrollHeight;
+      }
+
+      function updateSummary() {
+        const values = Array.from(sensors.values());
+        if (!values.length) {
+          summary.textContent = "No data yet.";
+          return;
+        }
+        summary.textContent = `Tracking ${values.length} sensors. Last update: ${values[0].updated}`;
+      }
+
+      function updateSensor(sensorId, value) {
+        const now = new Date().toLocaleTimeString();
+        sensors.set(sensorId, { id: sensorId, value, updated: now });
+        renderSensors();
+        updateSummary();
+        status.textContent = "Status: live updates active";
+      }
+
+      function fakeMqttTick() {
+        const temp = (3 + Math.random() * 4).toFixed(2);
+        const humidity = (50 + Math.random() * 10).toFixed(1);
+        const lift = Math.random() > 0.5 ? "raised" : "lowered";
+        updateSensor("fridge-temp", `${temp} °C`);
+        updateSensor("fridge-humidity", `${humidity} %`);
+        updateSensor("lift-state", lift);
+        addChatter(`[${new Date().toLocaleTimeString()}] kitt/sensor/fridge-temp/reading ${temp}`);
+        addChatter(
+          `[${new Date().toLocaleTimeString()}] kitt/sensor/fridge-humidity/reading ${humidity}`
+        );
+        addChatter(`[${new Date().toLocaleTimeString()}] kitt/lift/state ${lift}`);
+      }
+
+      setInterval(fakeMqttTick, 2000);
+    </script>
+  </body>
+</html>

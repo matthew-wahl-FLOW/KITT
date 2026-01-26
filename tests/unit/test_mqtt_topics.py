@@ -1,7 +1,7 @@
 """Unit tests for MQTT topic helpers.
 
-Simple: Validates MQTT topic constants and formatting helpers.
-Technical: Uses unittest to verify template contents and helper formatting.
+Overview: Validates MQTT topic constants and formatting helpers.
+Details: Uses unittest to verify template contents and helper formatting.
 """
 
 import unittest
@@ -14,6 +14,7 @@ class TestMqttTopics(unittest.TestCase):
         self.assertTrue(mqtt_topics.ORDER_NEW.endswith("order/new"))
         self.assertIn("{train_id}", mqtt_topics.TRAIN_LOCATION)
         self.assertIn("{sensor_id}", mqtt_topics.SENSOR_STATE)
+        self.assertIn("{sensor_id}", mqtt_topics.SENSOR_READING)
         self.assertIn("{command}", mqtt_topics.JMRI_COMMAND)
 
     def test_format_helpers(self) -> None:
@@ -29,11 +30,16 @@ class TestMqttTopics(unittest.TestCase):
             mqtt_topics.sensor_health_topic("sensor-1"),
             f"{mqtt_topics.BASE}/sensor/sensor-1/health",
         )
+        self.assertEqual(
+            mqtt_topics.sensor_reading_topic("sensor-1"),
+            f"{mqtt_topics.BASE}/sensor/sensor-1/reading",
+        )
 
     def test_topic_templates(self) -> None:
         templates = mqtt_topics.topic_templates()
         self.assertEqual(templates["ORDER_NEW"], mqtt_topics.ORDER_NEW)
         self.assertIn("JMRI_EVENT", templates)
+        self.assertIn("SENSOR_READING", templates)
 
 
 if __name__ == "__main__":

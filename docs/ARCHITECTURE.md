@@ -1,7 +1,7 @@
 # Architecture
 
-Simple: Summary of KITT system structure and responsibilities.
-Technical: Describes components, data flow, and deployment boundaries.
+Overview: Summary of KITT system structure and responsibilities.
+Details: Describes components, data flow, and deployment boundaries.
 
 ## Overview
 KITT is a distributed automation system for a model railroad delivery workflow. It separates

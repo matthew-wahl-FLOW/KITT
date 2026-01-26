@@ -1,7 +1,7 @@
 # Safety
 
-Simple: Safety expectations for hardware and software operations.
-Technical: Defines hardware interlocks, procedures, and safety defaults.
+Overview: Safety expectations for hardware and software operations.
+Details: Defines hardware interlocks, procedures, and safety defaults.
 
 ## Overview
 Safety in KITT relies on hardware interlocks and conservative software defaults. Hardware must

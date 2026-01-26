@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Load cell monitor service.
 
-Simple: Tracks load cell readings to verify beverage presence.
-Technical: Placeholder monitor with calibration state and logging output.
+Overview: Tracks load cell readings to verify beverage presence.
+Details: Placeholder monitor with calibration state and logging output.
 
 Missing info for further development:
 - Inputs: Raw ADC readings, sampling rate, calibration payloads.

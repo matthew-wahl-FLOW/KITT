@@ -1,7 +1,7 @@
 # JMRI Bridge Configuration
 
-Simple: Configuration guide for the JMRI bridge.
-Technical: Notes connectivity, scripts, and mapping expectations.
+Overview: Configuration guide for the JMRI bridge.
+Details: Notes connectivity, scripts, and mapping expectations.
 
 jmri_bridge connects JMRI to MQTT and optional web services.
 
