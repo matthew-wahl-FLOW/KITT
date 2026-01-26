@@ -39,8 +39,10 @@ class ApiHandler(BaseHTTPRequestHandler):
         if self.path.rstrip("/") == "/order":
             payload = self._read_json()
             order_id = payload.get("order_id", "order-001")
+            user = payload.get("user", "unknown")
             response = {
                 "order_id": order_id,
+                "user": user,
                 "topic": mqtt_topics.ORDER_NEW,
                 "status": "accepted",
             }
