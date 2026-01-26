@@ -4,6 +4,8 @@
 // // Publishes position and status via MQTT gateway (via serial placeholder)
 // // Interfaces: limit switches, motor driver, emergency stop
 
+#include <Arduino.h>
+
 const int kMotorEnablePin = 25;
 const int kMotorDirectionPin = 26;
 const int kLimitTopPin = 33;
@@ -13,6 +15,7 @@ const int kEmergencyStopPin = 27;
 const int kMaxLevels = 3;
 const unsigned long kLevelTravelMs = 2500;
 const unsigned long kCommandTimeoutMs = 15000;
+const unsigned long kMotionStallMs = 5000;
 
 enum ElevatorState {
   ELEVATOR_IDLE,
@@ -25,6 +28,7 @@ ElevatorState elevatorState = ELEVATOR_IDLE;
 int currentLevel = 0;
 int targetLevel = 0;
 unsigned long lastMoveMs = 0;
+unsigned long lastProgressMs = 0;
 
 void publishStatus(const char* status) {
   Serial.print("elevator/status ");
@@ -45,6 +49,7 @@ void startMotor(ElevatorState newState) {
   digitalWrite(kMotorDirectionPin, newState == ELEVATOR_MOVING_UP ? HIGH : LOW);
   digitalWrite(kMotorEnablePin, HIGH);
   lastMoveMs = millis();
+  lastProgressMs = lastMoveMs;
 }
 
 void startMove(int requestedLevel) {
@@ -107,19 +112,29 @@ void updateMotion() {
 
   if (elevatorState == ELEVATOR_MOVING_UP && hitTop) {
     currentLevel = kMaxLevels - 1;
+    lastProgressMs = millis();
   } else if (elevatorState == ELEVATOR_MOVING_DOWN && hitBottom) {
     currentLevel = 0;
-  } else if (millis() - lastMoveMs >= kLevelTravelMs) {
+    lastProgressMs = millis();
+  } else if (millis() >= lastMoveMs + kLevelTravelMs) {
     if (elevatorState == ELEVATOR_MOVING_UP) {
       currentLevel = min(currentLevel + 1, kMaxLevels - 1);
     } else {
       currentLevel = max(currentLevel - 1, 0);
     }
     lastMoveMs = millis();
+    lastProgressMs = lastMoveMs;
+  }
+
+  if (millis() >= lastProgressMs + kMotionStallMs) {
+    stopMotor();
+    elevatorState = ELEVATOR_FAULT;
+    publishStatus("fault_stall");
+    return;
   }
 
   if (currentLevel == targetLevel || hitTop || hitBottom ||
-      millis() - lastMoveMs > kCommandTimeoutMs) {
+      millis() >= lastMoveMs + kCommandTimeoutMs) {
     stopMotor();
     elevatorState = ELEVATOR_IDLE;
     publishPosition();

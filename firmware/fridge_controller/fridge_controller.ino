@@ -4,6 +4,7 @@
 // // Publishes status: ready, dispensing, cooling, error
 // // Interfaces: servo, door sensor, dispense sensor, temp/humidity sensor, peltier relay, fan relay
 
+#include <Arduino.h>
 #include <math.h>
 
 const int kServoPin = 14;
@@ -16,6 +17,7 @@ const float kTargetTempC = 3.0;
 const float kTempDeadbandC = 1.0;
 const float kDewpointMarginC = 1.0;
 const float kHumidityPercent = 55.0;
+const unsigned long kDispenseDurationMs = 1500;
 
 bool peltierOn = false;
 bool fanOn = false;
@@ -87,7 +89,7 @@ void handleDispense() {
   }
 
   publishStatus("dispensing");
-  delay(1500);
+  delay(kDispenseDurationMs);
   bool dispensed = digitalRead(kDispenseSensorPin) == LOW;
   if (dispensed) {
     publishStatus("done");

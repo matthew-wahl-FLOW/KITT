@@ -24,6 +24,11 @@ from typing import List
 
 from services.utils import mqtt_topics
 
+TEMP_BASE_C = 3.0
+TEMP_RANGE_C = 4.0
+HUMIDITY_BASE = 52.0
+HUMIDITY_RANGE = 6.0
+
 
 @dataclass
 class SensorReading:
@@ -92,8 +97,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def simulate_cycle(display: DisplayDashboard) -> None:
     """Generate a simulated update cycle."""
-    temp_c = round(3 + random.random() * 4, 2)
-    humidity = round(52 + random.random() * 6, 1)
+    temp_c = round(TEMP_BASE_C + random.random() * TEMP_RANGE_C, 2)
+    humidity = round(HUMIDITY_BASE + random.random() * HUMIDITY_RANGE, 1)
     lift_state = random.choice(["raised", "lowered"])
     display.update_reading("fridge-temp", f"{temp_c} °C")
     display.update_reading("fridge-humidity", f"{humidity} %")

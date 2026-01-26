@@ -4,6 +4,8 @@
 // // Cuts track power to isolated section when lowering
 // // Publishes lift state and safety interlock status via MQTT gateway (via serial placeholder)
 
+#include <Arduino.h>
+
 const int kLiftMotorPin = 18;
 const int kLockRelayPin = 19;
 const int kTrackPowerRelayPin = 21;
@@ -86,7 +88,7 @@ void updateLift() {
     liftState = LIFT_IDLE;
     publishState("lowered");
   } else if ((liftState == LIFT_RAISING || liftState == LIFT_LOWERING) &&
-             millis() - liftStartMs > kLiftTravelMs) {
+             millis() >= liftStartMs + kLiftTravelMs) {
     stopLift();
     liftState = LIFT_FAULT;
     publishState("fault_timeout");

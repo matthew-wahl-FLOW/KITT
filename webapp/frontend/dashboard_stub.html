@@ -100,7 +100,15 @@
         sensorTable.innerHTML = "";
         Array.from(sensors.values()).forEach((sensor) => {
           const row = document.createElement("tr");
-          row.innerHTML = `<td>${sensor.id}</td><td>${sensor.value}</td><td>${sensor.updated}</td>`;
+          const idCell = document.createElement("td");
+          const valueCell = document.createElement("td");
+          const updatedCell = document.createElement("td");
+          idCell.textContent = sensor.id;
+          valueCell.textContent = sensor.value;
+          updatedCell.textContent = sensor.updated;
+          row.appendChild(idCell);
+          row.appendChild(valueCell);
+          row.appendChild(updatedCell);
           sensorTable.appendChild(row);
         });
       }
