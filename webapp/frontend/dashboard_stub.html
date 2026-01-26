@@ -1,3 +1,101 @@
-<!-- // Dashboard stub showing live train positions, switch states, camera feed placeholder, and order UI -->
-<!-- // Connects to MQTT over WebSocket or backend API for live updates -->
-<!-- // Placeholder UI elements: map, train list, order form, camera iframe -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KITT Dashboard Stub</title>
+    <style>
+      :root {
+        --kitt-blue: rgb(0, 0, 221);
+        --kitt-gray: rgb(151, 153, 155);
+      }
+
+      body {
+        margin: 0;
+        padding: 32px;
+        font-family: "D-DIN", "DIN", "Arial", sans-serif;
+        color: var(--kitt-gray);
+        background: #ffffff;
+      }
+
+      h1,
+      h2 {
+        margin: 0 0 12px;
+        color: var(--kitt-blue);
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0 0 12px;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .panel {
+        border: 1px solid var(--kitt-gray);
+        border-radius: 12px;
+        padding: 16px;
+      }
+
+      .label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--kitt-blue);
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--kitt-blue);
+        color: var(--kitt-blue);
+        font-size: 0.85rem;
+      }
+
+      .placeholder {
+        margin-top: 12px;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px dashed var(--kitt-gray);
+        color: var(--kitt-gray);
+        text-align: center;
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>KITT Operations Dashboard</h1>
+      <p>Live telemetry placeholders for train locations, switches, and orders.</p>
+    </header>
+
+    <section class="grid">
+      <div class="panel">
+        <div class="label">Layout Map</div>
+        <div class="placeholder">Train position map placeholder</div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Active Trains</div>
+        <p class="pill">Train-03 • Moving</p>
+        <div class="placeholder">Train list and switch states</div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Camera Feed</div>
+        <div class="placeholder">Camera iframe placeholder</div>
+      </div>
+
+      <div class="panel">
+        <div class="label">Order Queue</div>
+        <p>Next order: <strong>Delivery A</strong></p>
+        <div class="placeholder">Order form placeholder</div>
+      </div>
+    </section>
+  </body>
+</html>
