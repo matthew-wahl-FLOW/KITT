@@ -1,3 +1,244 @@
-<!-- // Dashboard stub showing live train positions, switch states, camera feed placeholder, and order UI -->
-<!-- // Connects to MQTT over WebSocket or backend API for live updates -->
-<!-- // Placeholder UI elements: map, train list, order form, camera iframe -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KITT Dashboard (Stub)</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f6f7fb;
+        color: #1f2a44;
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: minmax(320px, 2fr) minmax(280px, 1fr);
+        gap: 24px;
+        padding: 24px;
+      }
+
+      .panel {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(31, 42, 68, 0.08);
+        padding: 18px 20px;
+      }
+
+      .panel h2,
+      .panel h3 {
+        margin: 0 0 12px;
+      }
+
+      .panel h3 {
+        margin-top: 18px;
+      }
+
+      .placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 180px;
+        background: repeating-linear-gradient(
+          45deg,
+          rgba(31, 42, 68, 0.06),
+          rgba(31, 42, 68, 0.06) 10px,
+          rgba(31, 42, 68, 0.02) 10px,
+          rgba(31, 42, 68, 0.02) 20px
+        );
+        border-radius: 12px;
+        color: #5a6b88;
+        font-weight: 600;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+
+      .order-form {
+        margin-bottom: 18px;
+      }
+
+      .order-form label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+
+      .order-form input {
+        width: 100%;
+        margin-top: 6px;
+        padding: 8px 10px;
+        border: 1px solid #d7dbe6;
+        border-radius: 8px;
+        font-size: 0.95rem;
+      }
+
+      .order-form button {
+        margin-top: 6px;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: #1f6feb;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .leaderboards {
+        display: grid;
+        gap: 16px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 6px 4px;
+        border-bottom: 1px solid #eef1f6;
+        font-size: 0.95rem;
+      }
+
+      th {
+        color: #5a6b88;
+        font-weight: 600;
+      }
+
+      .consumed {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        background: #102a43;
+        color: #ffffff;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 600;
+        box-shadow: 0 8px 18px rgba(16, 42, 67, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="dashboard">
+      <section class="panel">
+        <h2>Live Rail Map</h2>
+        <div class="placeholder">Map placeholder (MQTT live updates)</div>
+
+        <h3>Trains</h3>
+        <ul>
+          <li>Train 1 — Idle (Dock A)</li>
+          <li>Train 2 — Awaiting order</li>
+        </ul>
+
+        <h3>Switches</h3>
+        <ul>
+          <li>Switch A — Straight</li>
+          <li>Switch B — Diverging</li>
+        </ul>
+
+        <h3>Camera Feed</h3>
+        <div class="placeholder">Camera feed placeholder</div>
+      </section>
+
+      <aside class="panel">
+        <h2>Order Kokanees</h2>
+        <form class="order-form">
+          <label>
+            User (TBD)
+            <input type="text" name="user" placeholder="Enter name or badge" />
+          </label>
+          <label>
+            Quantity
+            <input type="number" name="quantity" min="1" placeholder="0" />
+          </label>
+          <label>
+            Delivery Note
+            <input type="text" name="note" placeholder="Optional note" />
+          </label>
+          <button type="button">Place Order</button>
+        </form>
+
+        <div class="leaderboards">
+          <section>
+            <h3>Weekly Leaderboard</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Kokanees</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Alex M.</td>
+                  <td>14</td>
+                </tr>
+                <tr>
+                  <td>Jamie R.</td>
+                  <td>12</td>
+                </tr>
+                <tr>
+                  <td>Priya S.</td>
+                  <td>10</td>
+                </tr>
+                <tr>
+                  <td>Chris L.</td>
+                  <td>9</td>
+                </tr>
+                <tr>
+                  <td>Jordan K.</td>
+                  <td>8</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section>
+            <h3>All-Time Leaderboard</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Kokanees</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Riley T.</td>
+                  <td>128</td>
+                </tr>
+                <tr>
+                  <td>Sam P.</td>
+                  <td>117</td>
+                </tr>
+                <tr>
+                  <td>Casey D.</td>
+                  <td>102</td>
+                </tr>
+                <tr>
+                  <td>Taylor V.</td>
+                  <td>96</td>
+                </tr>
+                <tr>
+                  <td>Morgan B.</td>
+                  <td>88</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <div class="consumed">Kokanee's Consumed: 248</div>
+  </body>
+</html>
