@@ -53,6 +53,7 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+services/data/*.db*
 
 instance/
 .webassets-cache
