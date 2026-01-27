@@ -1,6 +1,6 @@
 """Webapp backend API scaffold.
 
-Overview: Provides placeholder HTTP handlers for orders and train status.
+Overview: Provides HTTP handlers for orders, staff, and train status.
 Details: Minimal stdlib HTTP server with JSON responses and logging.
 
 Missing info for further development:
@@ -23,10 +23,12 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 try:
+    from services.orders.api import OrderService
     from services.utils import mqtt_topics
 except ModuleNotFoundError:  # pragma: no cover - allow direct script execution
     REPO_ROOT = Path(__file__).resolve().parents[2]
     sys.path.append(str(REPO_ROOT))
+    from services.orders.api import OrderService
     from services.utils import mqtt_topics
 
 WEBAPP_DIR = Path(__file__).resolve().parents[1]
@@ -37,35 +39,12 @@ WEEKLY_LEADERBOARD_FILE = DATA_DIR / "leaderboard_weekly.json"
 ALL_TIME_LEADERBOARD_FILE = DATA_DIR / "leaderboard_all_time.json"
 
 
-def _load_json(path: Path, default: Dict[str, Any]) -> Dict[str, Any]:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError:
-        return default
-    except json.JSONDecodeError:
-        return default
+ORDER_SERVICE: OrderService | None = None
 
 
-def _write_json(path: Path, payload: Dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-
-
-def _update_leaderboard(path: Path, user: str, quantity: int) -> List[Dict[str, Any]]:
-    data = _load_json(path, {"leaderboard": []})
-    leaderboard = data.get("leaderboard", [])
-    entry = next(
-        (item for item in leaderboard if item.get("name", "").lower() == user.lower()),
-        None,
-    )
-    if entry:
-        entry["count"] = int(entry.get("count", 0)) + quantity
-    else:
-        leaderboard.append({"name": user, "count": quantity})
-    leaderboard.sort(key=lambda item: int(item.get("count", 0)), reverse=True)
-    data["leaderboard"] = leaderboard
-    _write_json(path, data)
-    return leaderboard
+def build_order_service(db_path: Path | None = None) -> OrderService:
+    """Build an OrderService instance with optional DB path override."""
+    return OrderService(db_path=db_path)
 
 
 class ApiHandler(BaseHTTPRequestHandler):
@@ -96,21 +75,50 @@ class ApiHandler(BaseHTTPRequestHandler):
                 _load_json(ALL_TIME_LEADERBOARD_FILE, {"leaderboard": []}),
             )
             return
+        if path == "/orders":
+            service = self._order_service()
+            history = [record.to_dict() for record in service.get_history()]
+            self._send_json(HTTPStatus.OK, {"orders": history})
+            return
+        if path == "/orders/stats":
+            service = self._order_service()
+            self._send_json(HTTPStatus.OK, service.get_stats())
+            return
         self._send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
 
     def do_POST(self) -> None:  # noqa: N802 - stdlib method name
         path = self.path.split("?", 1)[0].rstrip("/")
         if path == "/order":
             payload = self._read_json()
-            order_id = payload.get("order_id", "order-001")
-            user = payload.get("user", "unknown")
+            user = str(payload.get("user", "unknown")).strip() or "unknown"
+            metadata = payload.get("metadata", {})
+            service = self._order_service()
+            order = service.create_order(user, metadata)
             response = {
-                "order_id": order_id,
-                "user": user,
+                "order": order.to_dict(),
                 "topic": mqtt_topics.ORDER_NEW,
                 "status": "accepted",
             }
             self._send_json(HTTPStatus.ACCEPTED, response)
+            return
+        if path == "/orders/status":
+            payload = self._read_json()
+            try:
+                order_id = int(payload.get("order_id", 0))
+            except (TypeError, ValueError):
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_order_id"})
+                return
+            status = str(payload.get("status", ""))
+            metadata = payload.get("metadata")
+            try:
+                updated = self._order_service().update_status(order_id, status, metadata)
+            except ValueError:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_status"})
+                return
+            if updated is None:
+                self._send_json(HTTPStatus.NOT_FOUND, {"error": "order_not_found"})
+                return
+            self._send_json(HTTPStatus.OK, {"order": updated.to_dict()})
             return
         if path == "/staff":
             payload = self._read_json()
@@ -144,6 +152,16 @@ class ApiHandler(BaseHTTPRequestHandler):
 
     def log_message(self, format: str, *args: object) -> None:
         logging.getLogger("kitt.webapp").info(format, *args)
+
+    def _order_service(self) -> OrderService:
+        if self.server is not None:
+            service = getattr(self.server, "order_service", None)
+            if service:
+                return service
+        global ORDER_SERVICE
+        if ORDER_SERVICE is None:
+            ORDER_SERVICE = build_order_service()
+        return ORDER_SERVICE
 
     def _maybe_serve_frontend(self, path: str) -> bool:
         if path in ("", "/"):
@@ -194,6 +212,50 @@ class ApiHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
 
+def _load_json(path: Path, default: Dict[str, Any]) -> Dict[str, Any]:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return default
+    except json.JSONDecodeError:
+        return default
+
+
+def _write_json(path: Path, payload: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def _update_leaderboard(path: Path, user: str, quantity: int) -> List[Dict[str, Any]]:
+    data = _load_json(path, {"leaderboard": []})
+    leaderboard = data.get("leaderboard", [])
+    entry = next(
+        (item for item in leaderboard if item.get("name", "").lower() == user.lower()),
+        None,
+    )
+    if entry:
+        entry["count"] = int(entry.get("count", 0)) + quantity
+    else:
+        leaderboard.append({"name": user, "count": quantity})
+    leaderboard.sort(key=lambda item: int(item.get("count", 0)), reverse=True)
+    data["leaderboard"] = leaderboard
+    _write_json(path, data)
+    return leaderboard
+
+
+class OrderHTTPServer(HTTPServer):
+    """HTTP server that carries a shared OrderService."""
+
+    def __init__(
+        self,
+        server_address: tuple[str, int],
+        RequestHandlerClass: type[BaseHTTPRequestHandler],
+        order_service: OrderService,
+    ) -> None:
+        super().__init__(server_address, RequestHandlerClass)
+        self.order_service = order_service
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build argument parser for CLI usage."""
     parser = argparse.ArgumentParser(description="KITT Web API (scaffold)")
@@ -207,7 +269,8 @@ def main(argv: List[str] | None = None) -> int:
     """Run the API scaffold server."""
     args = build_parser().parse_args(argv)
     logging.basicConfig(level=args.log_level, format="%(asctime)s %(levelname)s %(message)s")
-    server = HTTPServer((args.host, args.port), ApiHandler)
+    order_service = build_order_service()
+    server = OrderHTTPServer((args.host, args.port), ApiHandler, order_service)
     logging.getLogger("kitt.webapp").info("Serving on http://%s:%s", args.host, args.port)
     try:
         server.serve_forever()
