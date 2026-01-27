@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Use env to locate the system's Python 3 interpreter when run as a script.
+# Provide module-level documentation for the sensor gateway.
 """Sensor gateway service.
 
 Overview: Normalizes sensor events into standard MQTT topics.
@@ -35,6 +36,7 @@ from services.utils import mqtt_topics
 # Simple record for a raw sensor message payload.
 class SensorMessage:
     # Describe the sensor message dataclass for maintainers.
+    # Provide a docstring that explains the class purpose.
     """Represents a raw sensor message."""
 
     # Store the sensor identifier.
@@ -48,6 +50,7 @@ class SensorMessage:
 # Provide a minimal sensor gateway scaffold.
 class SensorGateway:
     # Describe the sensor gateway class for maintainers.
+    # Provide a docstring that explains the class purpose.
     """Minimal sensor gateway scaffold."""
 
     # Initialize the gateway with a logger.
@@ -61,11 +64,17 @@ class SensorGateway:
         """Log a placeholder normalization action."""
         # Build the normalized topic and log the placeholder action.
         topic = mqtt_topics.sensor_state_topic(message.sensor_id)
+        # Log the normalized message for downstream monitoring.
         self.logger.info(
+            # Provide a format string that includes sensor identity and topic.
             "Normalized sensor message sensor_id=%s type=%s value=%s topic=%s",
+            # Provide the sensor identifier argument for the log.
             message.sensor_id,
+            # Provide the sensor type argument for the log.
             message.sensor_type,
+            # Provide the sensor value argument for the log.
             message.value,
+            # Provide the topic argument for the log.
             topic,
         )
 
@@ -75,6 +84,7 @@ class SensorGateway:
         """Log a placeholder health publish."""
         # Build the health topic and log the placeholder action.
         topic = mqtt_topics.sensor_health_topic(sensor_id)
+        # Log the health status for operators and monitoring.
         self.logger.info("Sensor health sensor_id=%s status=%s topic=%s", sensor_id, status, topic)
 
 
@@ -111,8 +121,17 @@ def main(argv: List[str] | None = None) -> int:
 
     # Instantiate the gateway and emit placeholder messages.
     gateway = SensorGateway(logger)
+    # Build a placeholder sensor message from CLI arguments.
+    message = SensorMessage(
+        # Use the CLI-provided sensor identifier.
+        sensor_id=args.sensor_id,
+        # Use the CLI-provided sensor type label.
+        sensor_type=args.sensor_type,
+        # Use the CLI-provided sensor value.
+        value=args.value,
+    )
     # Normalize a placeholder sensor message.
-    gateway.normalize(SensorMessage(sensor_id=args.sensor_id, sensor_type=args.sensor_type, value=args.value))
+    gateway.normalize(message)
     # Publish a placeholder health update.
     gateway.publish_health(args.sensor_id, args.health)
     # Exit cleanly for CLI integration.
