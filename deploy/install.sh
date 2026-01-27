@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Use bash via env for portability across Linux environments.
 # PURPOSE:
 #   Idempotent installer for KITT services and configs.
 #   Copies versioned files from the repo into OS locations,
@@ -18,6 +19,7 @@
 # 11) Start services in dependency order (e.g., mqtt → jmri → orchestrator → camera → health).
 # 12) Print status summary and next steps.
 
+# Fail fast on errors, unset variables, or pipe failures to keep installs safe.
 set -euo pipefail
 
 # 1) Resolve repo root
