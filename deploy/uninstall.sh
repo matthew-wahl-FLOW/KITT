@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Use bash via env for portability across Linux environments.
 # PURPOSE:
 #   Remove previously installed KITT services and configs.
 #   CAUTION: destructive — intended for clean teardown or redeploy.
@@ -12,6 +13,7 @@
 # 6) Optionally remove /opt/kitt code, /var/lib/kitt data, /var/log/kitt logs (prompt the user).
 # 7) daemon-reload and print summary.
 
+# Fail fast on errors, unset variables, or pipe failures to keep removals safe.
 set -euo pipefail
 
 # Stop services (pseudo)

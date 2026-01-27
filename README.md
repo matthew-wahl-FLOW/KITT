@@ -1,10 +1,9 @@
 
 # KITT — Kokanee Integrated Transportation Team
 
-Overview: High-level overview of the KITT automation system repository.
-Details: Describes architecture layers, responsibilities, and repository layout.
+High-level overview of the KITT automation system repository. Describes architecture layers, responsibilities, and repository layout.
 
-KITT is a distributed automation system that coordinates a DCC‑controlled model railroad and multiple mechanical subsystems to deliver a beverage from a refrigerator to a human-accessible delivery point.
+KITT is a distributed automation system that coordinates a DCC‑controlled model railroad and multiple mechanical subsystems to deliver a can of Kokanee Lager from a mechanically cooled compartment to a defined human-accessible delivery point.
 
 The system is designed around clear separation of concerns, deterministic control at the lowest possible layer, and offline-first operation.
 

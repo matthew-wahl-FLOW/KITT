@@ -1,115 +1,132 @@
-// lift_controller.ino
-// // Controls the track lift mechanism
-// // Verifies mechanical locks before lowering/raising
-// // Cuts track power to isolated section when lowering
-// // Publishes lift state and safety interlock status via MQTT gateway (via serial placeholder)
+# lift_controller.ino
+# Controls the track lift mechanism (MicroPython)
+# Verifies mechanical locks before lowering/raising
+# Cuts track power to isolated section when lowering
+# Publishes lift state and safety interlock status via MQTT gateway (via UART placeholder)
 
-#include <Arduino.h>
+from machine import Pin, UART
+import time
 
-const int kLiftMotorPin = 18;
-const int kLockRelayPin = 19;
-const int kTrackPowerRelayPin = 21;
-const int kLiftUpLimitPin = 22;
-const int kLiftDownLimitPin = 23;
+kLiftMotorPin = 18
+kLockRelayPin = 19
+kTrackPowerRelayPin = 21
+kLiftUpLimitPin = 22
+kLiftDownLimitPin = 23
 
-const unsigned long kLiftTravelMs = 4000;
-const unsigned long kLockReleaseMs = 800;
+kLiftTravelMs = 4000
+kLockReleaseMs = 800
 
-enum LiftState {
-  LIFT_IDLE,
-  LIFT_RAISING,
-  LIFT_LOWERING,
-  LIFT_FAULT
-};
+LIFT_IDLE = 0
+LIFT_RAISING = 1
+LIFT_LOWERING = 2
+LIFT_FAULT = 3
 
-LiftState liftState = LIFT_IDLE;
-unsigned long liftStartMs = 0;
+lift_state = LIFT_IDLE
+lift_start_ms = 0
 
-void publishState(const char* state) {
-  Serial.print("lift/state ");
-  Serial.println(state);
-}
+uart = UART(0, baudrate=115200)
 
-void setTrackPower(bool enabled) {
-  digitalWrite(kTrackPowerRelayPin, enabled ? HIGH : LOW);
-}
+lift_motor = Pin(kLiftMotorPin, Pin.OUT)
+lock_relay = Pin(kLockRelayPin, Pin.OUT)
+track_power_relay = Pin(kTrackPowerRelayPin, Pin.OUT)
+lift_up_limit = Pin(kLiftUpLimitPin, Pin.IN, Pin.PULL_UP)
+lift_down_limit = Pin(kLiftDownLimitPin, Pin.IN, Pin.PULL_UP)
 
-void setLock(bool engaged) {
-  digitalWrite(kLockRelayPin, engaged ? HIGH : LOW);
-}
 
-void startLift(LiftState newState) {
-  liftState = newState;
-  digitalWrite(kLiftMotorPin, HIGH);
-  liftStartMs = millis();
-}
+def publish_state(state):
+    uart.write("lift/state {}\n".format(state))
 
-void stopLift() {
-  digitalWrite(kLiftMotorPin, LOW);
-}
 
-void handleCommand() {
-  if (!Serial.available()) {
-    return;
-  }
-  String command = Serial.readStringUntil('\n');
-  command.trim();
-  if (command == "LOWER") {
-    setLock(false);
-    delay(kLockReleaseMs);
-    setTrackPower(false);
-    startLift(LIFT_LOWERING);
-    publishState("lowering");
-  } else if (command == "RAISE") {
-    setLock(false);
-    delay(kLockReleaseMs);
-    startLift(LIFT_RAISING);
-    publishState("raising");
-  } else if (command == "STOP") {
-    stopLift();
-    liftState = LIFT_IDLE;
-    publishState("stopped");
-  }
-}
+def set_track_power(enabled):
+    track_power_relay.value(1 if enabled else 0)
 
-void updateLift() {
-  bool atTop = digitalRead(kLiftUpLimitPin) == LOW;
-  bool atBottom = digitalRead(kLiftDownLimitPin) == LOW;
 
-  if (liftState == LIFT_RAISING && atTop) {
-    stopLift();
-    setLock(true);
-    setTrackPower(true);
-    liftState = LIFT_IDLE;
-    publishState("raised");
-  } else if (liftState == LIFT_LOWERING && atBottom) {
-    stopLift();
-    setLock(true);
-    liftState = LIFT_IDLE;
-    publishState("lowered");
-  } else if ((liftState == LIFT_RAISING || liftState == LIFT_LOWERING) &&
-             millis() >= liftStartMs + kLiftTravelMs) {
-    stopLift();
-    liftState = LIFT_FAULT;
-    publishState("fault_timeout");
-  }
-}
+def set_lock(engaged):
+    lock_relay.value(1 if engaged else 0)
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(kLiftMotorPin, OUTPUT);
-  pinMode(kLockRelayPin, OUTPUT);
-  pinMode(kTrackPowerRelayPin, OUTPUT);
-  pinMode(kLiftUpLimitPin, INPUT_PULLUP);
-  pinMode(kLiftDownLimitPin, INPUT_PULLUP);
-  setTrackPower(true);
-  setLock(true);
-  stopLift();
-  publishState("ready");
-}
 
-void loop() {
-  handleCommand();
-  updateLift();
-  delay(50);
-}
+def start_lift(new_state):
+    global lift_state, lift_start_ms
+    lift_state = new_state
+    lift_motor.value(1)
+    lift_start_ms = time.ticks_ms()
+
+
+def stop_lift():
+    lift_motor.value(0)
+
+
+def read_command():
+    if not uart.any():
+        return None
+    line = uart.readline()
+    if not line:
+        return None
+    try:
+        return line.decode().strip()
+    except Exception:
+        return None
+
+
+def handle_command():
+    global lift_state
+    command = read_command()
+    if not command:
+        return
+    if command == "LOWER":
+        set_lock(False)
+        time.sleep_ms(kLockReleaseMs)
+        set_track_power(False)
+        start_lift(LIFT_LOWERING)
+        publish_state("lowering")
+    elif command == "RAISE":
+        set_lock(False)
+        time.sleep_ms(kLockReleaseMs)
+        start_lift(LIFT_RAISING)
+        publish_state("raising")
+    elif command == "STOP":
+        stop_lift()
+        lift_state = LIFT_IDLE
+        publish_state("stopped")
+
+
+def has_elapsed(start_ms, duration_ms):
+    return time.ticks_diff(time.ticks_ms(), start_ms) >= duration_ms
+
+
+def update_lift():
+    global lift_state
+    at_top = lift_up_limit.value() == 0
+    at_bottom = lift_down_limit.value() == 0
+
+    if lift_state == LIFT_RAISING and at_top:
+        stop_lift()
+        set_lock(True)
+        set_track_power(True)
+        lift_state = LIFT_IDLE
+        publish_state("raised")
+    elif lift_state == LIFT_LOWERING and at_bottom:
+        stop_lift()
+        set_lock(True)
+        lift_state = LIFT_IDLE
+        publish_state("lowered")
+    elif lift_state in (LIFT_RAISING, LIFT_LOWERING) and has_elapsed(
+        lift_start_ms, kLiftTravelMs
+    ):
+        stop_lift()
+        lift_state = LIFT_FAULT
+        publish_state("fault_timeout")
+
+
+def setup():
+    set_track_power(True)
+    set_lock(True)
+    stop_lift()
+    publish_state("ready")
+
+
+setup()
+while True:
+    handle_command()
+    update_lift()
+    time.sleep_ms(50)

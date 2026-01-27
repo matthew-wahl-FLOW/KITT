@@ -30,14 +30,14 @@
         padding: 18px 20px;
       }
 
-      .sidebar-logo {
+      .page-logo {
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         margin-bottom: 16px;
       }
 
-      .sidebar-logo img {
-        max-width: 200px;
+      .page-logo img {
+        max-width: 140px;
         width: 100%;
         height: auto;
       }
@@ -66,6 +66,65 @@
         border-radius: 12px;
         color: #5a6b88;
         font-weight: 600;
+      }
+
+      .data-grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .sensor-window {
+        background: #f1f4fb;
+        border-radius: 12px;
+        padding: 12px 14px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .sensor-row {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .sensor-label {
+        color: #5a6b88;
+        font-weight: 500;
+      }
+
+      .sensor-value {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .terminal-window {
+        background: #0b1326;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-family: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        color: #d6e2f5;
+        font-size: 0.88rem;
+      }
+
+      .terminal-line {
+        display: flex;
+        gap: 8px;
+      }
+
+      .terminal-line + .terminal-line {
+        margin-top: 6px;
+      }
+
+      .terminal-timestamp {
+        color: #7aa2f7;
+      }
+
+      .terminal-topic {
+        color: #9ece6a;
+      }
+
+      .terminal-payload {
+        color: #e0af68;
       }
 
       ul {
@@ -179,8 +238,48 @@
   <body>
     <main class="dashboard">
       <section class="panel">
+        <div class="page-logo">
+          <img src="./images/flow_engineering_logo.svg" alt="Flow Engineering logo" />
+        </div>
         <h2>Live Rail Map</h2>
         <div class="placeholder">Map placeholder (MQTT live updates)</div>
+
+        <div class="data-grid">
+          <section>
+            <h3>Sensor Readout</h3>
+            <div class="sensor-window">
+              <div class="sensor-row">
+                <span class="sensor-label">Fridge Temperature (°C)</span>
+                <span class="sensor-value">3.4</span>
+              </div>
+              <div class="sensor-row">
+                <span class="sensor-label">Relative Humidity (%)</span>
+                <span class="sensor-value">54.2</span>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3>System Stream</h3>
+            <div class="terminal-window" aria-label="System stream terminal">
+              <div class="terminal-line">
+                <span class="terminal-timestamp">23:24:36</span>
+                <span class="terminal-topic">kitt/sensor/fridge-temp</span>
+                <span class="terminal-payload">{ temp_c: 3.4 }</span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-timestamp">23:24:40</span>
+                <span class="terminal-topic">kitt/sensor/fridge-humidity</span>
+                <span class="terminal-payload">{ humidity: 54.2 }</span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-timestamp">23:24:44</span>
+                <span class="terminal-topic">kitt/lift/state</span>
+                <span class="terminal-payload">{ state: "raised" }</span>
+              </div>
+            </div>
+          </section>
+        </div>
 
         <h3>Trains</h3>
         <ul>
@@ -199,12 +298,6 @@
       </section>
 
       <aside class="panel">
-        <div class="sidebar-logo">
-          <img
-            src="./images/flow_engineering_logo.svg"
-            alt="Flow Engineering logo"
-          />
-        </div>
         <h2>Order Kokanees</h2>
         <form class="order-form">
           <label>
@@ -280,7 +373,10 @@
       const quantityInput = document.getElementById("quantity");
       const weeklyTable = document.getElementById("weeklyLeaderboard");
       const allTimeTable = document.getElementById("allTimeLeaderboard");
+      let staffRoster = [];
       let pendingOrder = null;
+
+      addStaffButton.hidden = true;
 
       const setStatus = (message, isError = false) => {
         statusMessage.textContent = message;
@@ -304,10 +400,20 @@
         });
       };
 
+      const updateAddStaffVisibility = () => {
+        const query = staffInput.value.trim().toLowerCase();
+        const hasMatch = query.length
+          ? staffRoster.some((name) => name.toLowerCase().includes(query))
+          : true;
+        addStaffButton.hidden = hasMatch;
+      };
+
       const loadStaffRoster = async () => {
         try {
           const data = await getStaffRoster();
-          renderStaffOptions(data.staff || []);
+          staffRoster = data.staff || [];
+          renderStaffOptions(staffRoster);
+          updateAddStaffVisibility();
           if (
             pendingOrder &&
             !data.staff?.some(
@@ -379,11 +485,17 @@
             throw new Error("Unable to add staff member");
           }
           const data = await response.json();
-          renderStaffOptions(data.staff || []);
+          staffRoster = data.staff || [];
+          renderStaffOptions(staffRoster);
+          updateAddStaffVisibility();
           setStatus(`Added ${name} to staff roster.`);
         } catch (error) {
           setStatus(error.message, true);
         }
+      });
+
+      staffInput.addEventListener("input", () => {
+        updateAddStaffVisibility();
       });
 
       placeOrderButton.addEventListener("click", async () => {
