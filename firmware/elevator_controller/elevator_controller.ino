@@ -1,162 +1,179 @@
-// elevator_controller.ino
-// // Controls elevator motors and limit switches
-// // Ensures safe movement with hardware interlocks
-// // Publishes position and status via MQTT gateway (via serial placeholder)
-// // Interfaces: limit switches, motor driver, emergency stop
+# elevator_controller.ino
+# Controls elevator motors and limit switches (MicroPython)
+# Ensures safe movement with hardware interlocks
+# Publishes position and status via MQTT gateway (via UART placeholder)
+# Interfaces: limit switches, motor driver, emergency stop
 
-#include <Arduino.h>
+from machine import Pin, UART
+import time
 
-const int kMotorEnablePin = 25;
-const int kMotorDirectionPin = 26;
-const int kLimitTopPin = 33;
-const int kLimitBottomPin = 32;
-const int kEmergencyStopPin = 27;
+kMotorEnablePin = 25
+kMotorDirectionPin = 26
+kLimitTopPin = 33
+kLimitBottomPin = 32
+kEmergencyStopPin = 27
 
-const int kMaxLevels = 3;
-const unsigned long kLevelTravelMs = 2500;
-const unsigned long kCommandTimeoutMs = 15000;
-const unsigned long kMotionStallMs = 5000;
+kMaxLevels = 3
+kLevelTravelMs = 2500
+kCommandTimeoutMs = 15000
+kMotionStallMs = 5000
 
-enum ElevatorState {
-  ELEVATOR_IDLE,
-  ELEVATOR_MOVING_UP,
-  ELEVATOR_MOVING_DOWN,
-  ELEVATOR_FAULT
-};
+ELEVATOR_IDLE = 0
+ELEVATOR_MOVING_UP = 1
+ELEVATOR_MOVING_DOWN = 2
+ELEVATOR_FAULT = 3
 
-ElevatorState elevatorState = ELEVATOR_IDLE;
-int currentLevel = 0;
-int targetLevel = 0;
-unsigned long lastMoveMs = 0;
-unsigned long lastProgressMs = 0;
+elevator_state = ELEVATOR_IDLE
+current_level = 0
+target_level = 0
+last_move_ms = 0
+last_progress_ms = 0
 
-void publishStatus(const char* status) {
-  Serial.print("elevator/status ");
-  Serial.println(status);
-}
+uart = UART(0, baudrate=115200)
 
-void publishPosition() {
-  Serial.print("elevator/position level=");
-  Serial.println(currentLevel);
-}
+motor_enable = Pin(kMotorEnablePin, Pin.OUT)
+motor_direction = Pin(kMotorDirectionPin, Pin.OUT)
+limit_top = Pin(kLimitTopPin, Pin.IN, Pin.PULL_UP)
+limit_bottom = Pin(kLimitBottomPin, Pin.IN, Pin.PULL_UP)
+emergency_stop = Pin(kEmergencyStopPin, Pin.IN, Pin.PULL_UP)
 
-void stopMotor() {
-  digitalWrite(kMotorEnablePin, LOW);
-}
 
-void startMotor(ElevatorState newState) {
-  elevatorState = newState;
-  digitalWrite(kMotorDirectionPin, newState == ELEVATOR_MOVING_UP ? HIGH : LOW);
-  digitalWrite(kMotorEnablePin, HIGH);
-  lastMoveMs = millis();
-  lastProgressMs = lastMoveMs;
-}
+def publish_status(status):
+    uart.write("elevator/status {}\n".format(status))
 
-void startMove(int requestedLevel) {
-  if (requestedLevel < 0) {
-    requestedLevel = 0;
-  } else if (requestedLevel >= kMaxLevels) {
-    requestedLevel = kMaxLevels - 1;
-  }
 
-  targetLevel = requestedLevel;
-  if (targetLevel == currentLevel) {
-    publishStatus("already_at_level");
-    return;
-  }
+def publish_position():
+    uart.write("elevator/position level={}\n".format(current_level))
 
-  if (targetLevel > currentLevel) {
-    startMotor(ELEVATOR_MOVING_UP);
-    publishStatus("moving_up");
-  } else {
-    startMotor(ELEVATOR_MOVING_DOWN);
-    publishStatus("moving_down");
-  }
-}
 
-void handleCommand() {
-  if (!Serial.available()) {
-    return;
-  }
-  String command = Serial.readStringUntil('\n');
-  command.trim();
-  if (command.startsWith("LEVEL")) {
-    int level = command.substring(5).toInt();
-    startMove(level);
-  } else if (command == "UP") {
-    startMove(currentLevel + 1);
-  } else if (command == "DOWN") {
-    startMove(currentLevel - 1);
-  } else if (command == "STOP") {
-    elevatorState = ELEVATOR_IDLE;
-    stopMotor();
-    publishStatus("stopped");
-  }
-}
+def stop_motor():
+    motor_enable.value(0)
 
-void updateSafety() {
-  if (digitalRead(kEmergencyStopPin) == LOW) {
-    elevatorState = ELEVATOR_FAULT;
-    stopMotor();
-    publishStatus("emergency_stop");
-  }
-}
 
-void updateMotion() {
-  if (elevatorState != ELEVATOR_MOVING_UP && elevatorState != ELEVATOR_MOVING_DOWN) {
-    return;
-  }
+def start_motor(new_state):
+    global elevator_state, last_move_ms, last_progress_ms
+    elevator_state = new_state
+    motor_direction.value(1 if new_state == ELEVATOR_MOVING_UP else 0)
+    motor_enable.value(1)
+    last_move_ms = time.ticks_ms()
+    last_progress_ms = last_move_ms
 
-  bool hitTop = digitalRead(kLimitTopPin) == LOW;
-  bool hitBottom = digitalRead(kLimitBottomPin) == LOW;
 
-  if (elevatorState == ELEVATOR_MOVING_UP && hitTop) {
-    currentLevel = kMaxLevels - 1;
-    lastProgressMs = millis();
-  } else if (elevatorState == ELEVATOR_MOVING_DOWN && hitBottom) {
-    currentLevel = 0;
-    lastProgressMs = millis();
-  } else if (millis() >= lastMoveMs + kLevelTravelMs) {
-    if (elevatorState == ELEVATOR_MOVING_UP) {
-      currentLevel = min(currentLevel + 1, kMaxLevels - 1);
-    } else {
-      currentLevel = max(currentLevel - 1, 0);
-    }
-    lastMoveMs = millis();
-    lastProgressMs = lastMoveMs;
-  }
+def start_move(requested_level):
+    global target_level
+    if requested_level < 0:
+        requested_level = 0
+    elif requested_level >= kMaxLevels:
+        requested_level = kMaxLevels - 1
 
-  if (millis() >= lastProgressMs + kMotionStallMs) {
-    stopMotor();
-    elevatorState = ELEVATOR_FAULT;
-    publishStatus("fault_stall");
-    return;
-  }
+    target_level = requested_level
+    if target_level == current_level:
+        publish_status("already_at_level")
+        return
 
-  if (currentLevel == targetLevel || hitTop || hitBottom ||
-      millis() >= lastMoveMs + kCommandTimeoutMs) {
-    stopMotor();
-    elevatorState = ELEVATOR_IDLE;
-    publishPosition();
-    publishStatus("idle");
-  }
-}
+    if target_level > current_level:
+        start_motor(ELEVATOR_MOVING_UP)
+        publish_status("moving_up")
+    else:
+        start_motor(ELEVATOR_MOVING_DOWN)
+        publish_status("moving_down")
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(kMotorEnablePin, OUTPUT);
-  pinMode(kMotorDirectionPin, OUTPUT);
-  pinMode(kLimitTopPin, INPUT_PULLUP);
-  pinMode(kLimitBottomPin, INPUT_PULLUP);
-  pinMode(kEmergencyStopPin, INPUT_PULLUP);
-  stopMotor();
-  publishStatus("ready");
-  publishPosition();
-}
 
-void loop() {
-  handleCommand();
-  updateSafety();
-  updateMotion();
-  delay(50);
-}
+def read_command():
+    if not uart.any():
+        return None
+    line = uart.readline()
+    if not line:
+        return None
+    try:
+        return line.decode().strip()
+    except Exception:
+        return None
+
+
+def handle_command():
+    global elevator_state
+    command = read_command()
+    if not command:
+        return
+    if command.startswith("LEVEL"):
+        level_text = command[5:].strip()
+        try:
+            level = int(level_text)
+        except ValueError:
+            level = 0
+        start_move(level)
+    elif command == "UP":
+        start_move(current_level + 1)
+    elif command == "DOWN":
+        start_move(current_level - 1)
+    elif command == "STOP":
+        elevator_state = ELEVATOR_IDLE
+        stop_motor()
+        publish_status("stopped")
+
+
+def has_elapsed(start_ms, duration_ms):
+    return time.ticks_diff(time.ticks_ms(), start_ms) >= duration_ms
+
+
+def update_safety():
+    global elevator_state
+    if emergency_stop.value() == 0:
+        elevator_state = ELEVATOR_FAULT
+        stop_motor()
+        publish_status("emergency_stop")
+
+
+def update_motion():
+    global current_level, elevator_state, last_move_ms, last_progress_ms
+    if elevator_state not in (ELEVATOR_MOVING_UP, ELEVATOR_MOVING_DOWN):
+        return
+
+    hit_top = limit_top.value() == 0
+    hit_bottom = limit_bottom.value() == 0
+
+    if elevator_state == ELEVATOR_MOVING_UP and hit_top:
+        current_level = kMaxLevels - 1
+        last_progress_ms = time.ticks_ms()
+    elif elevator_state == ELEVATOR_MOVING_DOWN and hit_bottom:
+        current_level = 0
+        last_progress_ms = time.ticks_ms()
+    elif has_elapsed(last_move_ms, kLevelTravelMs):
+        if elevator_state == ELEVATOR_MOVING_UP:
+            current_level = min(current_level + 1, kMaxLevels - 1)
+        else:
+            current_level = max(current_level - 1, 0)
+        last_move_ms = time.ticks_ms()
+        last_progress_ms = last_move_ms
+
+    if has_elapsed(last_progress_ms, kMotionStallMs):
+        stop_motor()
+        elevator_state = ELEVATOR_FAULT
+        publish_status("fault_stall")
+        return
+
+    if (
+        current_level == target_level
+        or hit_top
+        or hit_bottom
+        or has_elapsed(last_move_ms, kCommandTimeoutMs)
+    ):
+        stop_motor()
+        elevator_state = ELEVATOR_IDLE
+        publish_position()
+        publish_status("idle")
+
+
+def setup():
+    stop_motor()
+    publish_status("ready")
+    publish_position()
+
+
+setup()
+while True:
+    handle_command()
+    update_safety()
+    update_motion()
+    time.sleep_ms(50)

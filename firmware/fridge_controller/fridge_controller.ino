@@ -1,121 +1,129 @@
-// fridge_controller.ino
-// // Controls fridge dispenser servo, peltier cooler, and fan logic
-// // Subscribes to MQTT via serial gateway or onboard WiFi (placeholder)
-// // Publishes status: ready, dispensing, cooling, error
-// // Interfaces: servo, door sensor, dispense sensor, temp/humidity sensor, peltier relay, fan relay
+# fridge_controller.ino
+# Controls fridge dispenser servo, peltier cooler, and fan logic (MicroPython)
+# Subscribes to MQTT via serial gateway or onboard WiFi (placeholder)
+# Publishes status: ready, dispensing, cooling, error
+# Interfaces: servo, door sensor, dispense sensor, temp/humidity sensor, peltier relay, fan relay
 
-#include <Arduino.h>
-#include <math.h>
+from machine import Pin, UART
+import math
+import time
 
-const int kServoPin = 14;
-const int kDoorSensorPin = 27;
-const int kDispenseSensorPin = 26;
-const int kPeltierRelayPin = 25;
-const int kFanRelayPin = 33;
+kServoPin = 14
+kDoorSensorPin = 27
+kDispenseSensorPin = 26
+kPeltierRelayPin = 25
+kFanRelayPin = 33
 
-const float kTargetTempC = 3.0;
-const float kTempDeadbandC = 1.0;
-const float kDewpointMarginC = 1.0;
-const float kHumidityPercent = 55.0;
-const unsigned long kDispenseDurationMs = 1500;
+kTargetTempC = 3.0
+kTempDeadbandC = 1.0
+kDewpointMarginC = 1.0
+kHumidityPercent = 55.0
+kDispenseDurationMs = 1500
 
-bool peltierOn = false;
-bool fanOn = false;
+peltier_on = False
+fan_on = False
 
-float fakeTemperatureC() {
-  float phase = (millis() % 20000) / 20000.0;
-  return kTargetTempC + 2.0 * sin(phase * 2.0 * PI);
-}
+uart = UART(0, baudrate=115200)
 
-float fakeHumidity() {
-  float phase = (millis() % 15000) / 15000.0;
-  return kHumidityPercent + 5.0 * cos(phase * 2.0 * PI);
-}
+servo = Pin(kServoPin, Pin.OUT)
+door_sensor = Pin(kDoorSensorPin, Pin.IN, Pin.PULL_UP)
+dispense_sensor = Pin(kDispenseSensorPin, Pin.IN, Pin.PULL_UP)
+peltier_relay = Pin(kPeltierRelayPin, Pin.OUT)
+fan_relay = Pin(kFanRelayPin, Pin.OUT)
 
-float computeDewPoint(float tempC, float humidityPercent) {
-  float alpha = ((17.27 * tempC) / (237.7 + tempC)) + log(humidityPercent / 100.0);
-  return (237.7 * alpha) / (17.27 - alpha);
-}
 
-void publishTelemetry(float tempC, float humidityPercent, float dewPointC) {
-  Serial.print("fridge/telemetry temp_c=");
-  Serial.print(tempC, 2);
-  Serial.print(" humidity=");
-  Serial.print(humidityPercent, 1);
-  Serial.print(" dewpoint_c=");
-  Serial.println(dewPointC, 2);
-}
+def fake_temperature_c():
+    phase = (time.ticks_ms() % 20000) / 20000.0
+    return kTargetTempC + 2.0 * math.sin(phase * 2.0 * math.pi)
 
-void publishStatus(const char* status) {
-  Serial.print("fridge/status ");
-  Serial.println(status);
-}
 
-void setRelay(int pin, bool enabled) {
-  digitalWrite(pin, enabled ? HIGH : LOW);
-}
+def fake_humidity():
+    phase = (time.ticks_ms() % 15000) / 15000.0
+    return kHumidityPercent + 5.0 * math.cos(phase * 2.0 * math.pi)
 
-void updateCooling(float tempC, float dewPointC) {
-  if (tempC > kTargetTempC + kTempDeadbandC) {
-    peltierOn = true;
-  } else if (tempC < kTargetTempC - kTempDeadbandC) {
-    peltierOn = false;
-  }
 
-  if (tempC - dewPointC <= kDewpointMarginC) {
-    fanOn = false;
-  } else {
-    fanOn = true;
-  }
+def compute_dew_point(temp_c, humidity_percent):
+    alpha = ((17.27 * temp_c) / (237.7 + temp_c)) + math.log(humidity_percent / 100.0)
+    return (237.7 * alpha) / (17.27 - alpha)
 
-  setRelay(kPeltierRelayPin, peltierOn);
-  setRelay(kFanRelayPin, fanOn);
-}
 
-void handleDispense() {
-  if (!Serial.available()) {
-    return;
-  }
-  String command = Serial.readStringUntil('\n');
-  command.trim();
-  if (command != "DISPENSE") {
-    return;
-  }
+def publish_telemetry(temp_c, humidity_percent, dew_point_c):
+    uart.write(
+        "fridge/telemetry temp_c={:.2f} humidity={:.1f} dewpoint_c={:.2f}\n".format(
+            temp_c, humidity_percent, dew_point_c
+        )
+    )
 
-  bool doorClosed = digitalRead(kDoorSensorPin) == LOW;
-  if (!doorClosed) {
-    publishStatus("error_door_open");
-    return;
-  }
 
-  publishStatus("dispensing");
-  delay(kDispenseDurationMs);
-  bool dispensed = digitalRead(kDispenseSensorPin) == LOW;
-  if (dispensed) {
-    publishStatus("done");
-  } else {
-    publishStatus("error_dispense_timeout");
-  }
-}
+def publish_status(status):
+    uart.write("fridge/status {}\n".format(status))
 
-void setup() {
-  Serial.begin(115200);
-  pinMode(kServoPin, OUTPUT);
-  pinMode(kDoorSensorPin, INPUT_PULLUP);
-  pinMode(kDispenseSensorPin, INPUT_PULLUP);
-  pinMode(kPeltierRelayPin, OUTPUT);
-  pinMode(kFanRelayPin, OUTPUT);
-  setRelay(kPeltierRelayPin, false);
-  setRelay(kFanRelayPin, false);
-  publishStatus("ready");
-}
 
-void loop() {
-  float tempC = fakeTemperatureC();
-  float humidity = fakeHumidity();
-  float dewPointC = computeDewPoint(tempC, humidity);
-  updateCooling(tempC, dewPointC);
-  publishTelemetry(tempC, humidity, dewPointC);
-  handleDispense();
-  delay(1000);
-}
+def set_relay(relay, enabled):
+    relay.value(1 if enabled else 0)
+
+
+def update_cooling(temp_c, dew_point_c):
+    global peltier_on, fan_on
+    if temp_c > kTargetTempC + kTempDeadbandC:
+        peltier_on = True
+    elif temp_c < kTargetTempC - kTempDeadbandC:
+        peltier_on = False
+
+    if temp_c - dew_point_c <= kDewpointMarginC:
+        fan_on = False
+    else:
+        fan_on = True
+
+    set_relay(peltier_relay, peltier_on)
+    set_relay(fan_relay, fan_on)
+
+
+def read_command():
+    if not uart.any():
+        return None
+    line = uart.readline()
+    if not line:
+        return None
+    try:
+        return line.decode().strip()
+    except Exception:
+        return None
+
+
+def handle_dispense():
+    command = read_command()
+    if not command:
+        return
+    if command != "DISPENSE":
+        return
+
+    door_closed = door_sensor.value() == 0
+    if not door_closed:
+        publish_status("error_door_open")
+        return
+
+    publish_status("dispensing")
+    time.sleep_ms(kDispenseDurationMs)
+    dispensed = dispense_sensor.value() == 0
+    if dispensed:
+        publish_status("done")
+    else:
+        publish_status("error_dispense_timeout")
+
+
+def setup():
+    set_relay(peltier_relay, False)
+    set_relay(fan_relay, False)
+    publish_status("ready")
+
+
+setup()
+while True:
+    temp_c = fake_temperature_c()
+    humidity = fake_humidity()
+    dew_point_c = compute_dew_point(temp_c, humidity)
+    update_cooling(temp_c, dew_point_c)
+    publish_telemetry(temp_c, humidity, dew_point_c)
+    handle_dispense()
+    time.sleep_ms(1000)
