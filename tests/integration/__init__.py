@@ -1,3 +1,4 @@
+# Provide module documentation for the integration test package.
 """Integration tests package.
 
 Overview: Integration test module namespace.

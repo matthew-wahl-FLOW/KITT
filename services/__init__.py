@@ -1,3 +1,4 @@
+# Provide module documentation for the services package.
 """Services package.
 
 Overview: Marks the services directory as a Python package.
