@@ -1,4 +1,5 @@
 # Document the purpose of this unit test module.
+# Define the module docstring for the webapp API tests.
 """Unit tests for webapp API helper functions."""
 
 # Import utilities for dynamic module loading.

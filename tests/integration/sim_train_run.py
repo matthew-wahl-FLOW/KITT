@@ -1,15 +1,12 @@
 # Document the purpose of this integration test module.
-"""Integration simulation scaffold for a train run.
-
-Overview: Exercises orchestrator scaffolds with placeholder values.
-Details: Uses unittest to ensure basic interactions run without errors.
-
-Missing info for further development:
-- Inputs: Realistic sensor timelines and layout topology.
-- Outputs: Expected command sequencing and state transitions.
-- Actions: Simulated MQTT broker and message ordering.
-- Methods: Assertions against telemetry streams and timing constraints.
-"""
+"""Integration simulation scaffold for a train run."""
+# Overview: Exercises orchestrator scaffolds with placeholder values.
+# Details: Uses unittest to ensure basic interactions run without errors.
+# Missing info for further development:
+# - Inputs: Realistic sensor timelines and layout topology.
+# - Outputs: Expected command sequencing and state transitions.
+# - Actions: Simulated MQTT broker and message ordering.
+# - Methods: Assertions against telemetry streams and timing constraints.
 
 # Import logging so the orchestrator can emit log output.
 import logging
