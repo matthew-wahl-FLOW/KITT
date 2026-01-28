@@ -1,5 +1,5 @@
-"""Services package.
-
-Overview: Marks the services directory as a Python package.
-Details: Enables imports for service scaffolds and shared utilities.
-"""
+# Provide module documentation for the services package.
+# Define the module docstring for the services package.
+"""Services package."""
+# Overview: Marks the services directory as a Python package.
+# Details: Enables imports for service scaffolds and shared utilities.

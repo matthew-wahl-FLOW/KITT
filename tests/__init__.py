@@ -1,5 +1,5 @@
-"""Test package.
-
-Overview: Test package marker for discovery.
-Details: Enables imports in unit and integration tests.
-"""
+# Provide module documentation for the test package.
+# Define the module docstring for the test package.
+"""Test package."""
+# Overview: Test package marker for discovery.
+# Details: Enables imports in unit and integration tests.
