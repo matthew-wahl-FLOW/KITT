@@ -1,0 +1,2 @@
+# KITT runtime Python dependencies (stdlib-only as of this version).
+# No third-party Python packages are required by the current services.

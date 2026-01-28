@@ -102,6 +102,7 @@ runtime services (JMRI, Python orchestration, MQTT, and supporting hardware inte
    - `sudo apt -y install git curl jq python3 python3-venv python3-pip`
    - `sudo apt -y install openjdk-17-jre-headless`
    - `sudo apt -y install mosquitto mosquitto-clients` (if running local MQTT)
+   - `sudo apt -y install sqlite3` (optional CLI tooling for order database inspection)
 5. **Verify Python version**
    - `python3 --version` (expect 3.11 or newer per CI workflow)
 6. **Optional: enable interfaces**
@@ -121,8 +122,10 @@ runtime services (JMRI, Python orchestration, MQTT, and supporting hardware inte
    - `python3 -m venv .venv`
    - `source .venv/bin/activate`
 4. **Install Python dependencies**
-   - If/when a `requirements.txt` or `pyproject.toml` exists, install it:
-     - `pip install -r requirements.txt` (or the appropriate project file)
+   - Install runtime Python dependencies from the repository root:
+     - `pip install -r requirements.txt`
+   - Current services only use the standard library; the file is still provided
+     to keep deployments consistent and future additions explicit.
 5. **Environment files**
    - Create `/etc/kitt/kitt.env` and define:
      - MQTT host/port/credentials
