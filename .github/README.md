@@ -7,7 +7,7 @@
 - `.github/ISSUE_TEMPLATE.md` captures reproducible issue information.
 
 ## Missing Info for Further Development
-- **Inputs**: Required secrets and runner constraints.
-- **Outputs**: Artifact retention and reporting expectations.
-- **Actions**: Release automation and deployment workflows.
-- **Methods**: Security scanning and dependency update policy.
+- Required secrets and runner constraints are not documented yet.
+- Artifact retention and reporting expectations remain undefined.
+- Release automation and deployment workflows are still pending.
+- Security scanning and dependency update policy needs to be specified.
