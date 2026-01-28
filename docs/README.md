@@ -36,6 +36,7 @@ between hardware, firmware, and software teams.
 
 ## Core References
 - `ARCHITECTURE.md` - System overview and component boundaries.
+- `DEPLOYMENT_READINESS.md` - Deployment readiness runbook for Raspberry Pi installs.
 - `MQTT_TOPICS.md` - Message bus topic hierarchy and QoS guidance.
 - `SAFETY.md` - Safety procedures and expectations.
 - `TEST_PLAN.md` - Testing scope and acceptance criteria.
