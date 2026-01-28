@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 # Use env to locate the system's Python 3 interpreter when run as a script.
 # Provide module-level context for the JMRI bridge service.
-"""JMRI bridge service.
-
-Overview: Logs incoming command intents destined for JMRI.
-Details: Placeholder bridge that mirrors commands/events via logging only.
-
-Missing info for further development:
-- Inputs: JMRI connection details, command payload schema.
-- Outputs: Event payload schema for train/turnout updates.
-- Actions: Connection lifecycle, retry policies, idempotency.
-- Methods: JMRI API integration specifics, error mapping.
-"""
+# Start the module docstring for the JMRI bridge.
+"""JMRI bridge service."""
+# Summarize what the bridge provides.
+# Overview: Logs incoming command intents destined for JMRI.
+# Explain how the scaffold behaves.
+# Details: Placeholder bridge that mirrors commands/events via logging only.
+# Capture open questions for future development.
+# Missing info for further development:
+# Identify required input definitions.
+# - Inputs: JMRI connection details, command payload schema.
+# Identify required output schemas.
+# - Outputs: Event payload schema for train/turnout updates.
+# Identify required operational actions.
+# - Actions: Connection lifecycle, retry policies, idempotency.
+# Identify required implementation methods.
+# - Methods: JMRI API integration specifics, error mapping.
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -64,11 +69,17 @@ class JmriBridge:
         topic = mqtt_topics.jmri_command_topic(command.command)
         # Log the command details so operators can trace intent.
         self.logger.info(
+            # Provide the log format string for the command.
             "JMRI command received command=%s target=%s value=%s topic=%s",
+            # Provide the command name argument for the log.
             command.command,
+            # Provide the command target argument for the log.
             command.target,
+            # Provide the command value argument for the log.
             command.value,
+            # Provide the MQTT topic argument for the log.
             topic,
+            # Close the logger call.
         )
 
     # Publish a placeholder event from JMRI.

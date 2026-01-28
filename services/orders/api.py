@@ -1,9 +1,11 @@
 # Document the purpose of the order service API module.
-"""Order service API surface.
-
-Overview: Provides business logic for creating and querying orders.
-Details: Acts as the single source of truth for order state.
-"""
+# Provide the module docstring for the order service API.
+# Start the module docstring for the order service API.
+"""Order service API surface."""
+# Summarize what the module provides.
+# Overview: Provides business logic for creating and querying orders.
+# Explain the role of this module in the system.
+# Details: Acts as the single source of truth for order state.
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -28,9 +30,13 @@ class OrderService:
 
     # Initialize the order service with storage overrides.
     def __init__(
+        # Accept the implicit instance reference.
         self,
+        # Accept a storage override for tests or custom backends.
         storage: OrderStorage | None = None,
+        # Accept a database path override for new storage.
         db_path: Path | None = None,
+        # Close the initializer argument list.
     ) -> None:
         # Use provided storage or create a new SQLite-backed storage layer.
         self._storage = storage or OrderStorage(db_path)
@@ -46,15 +52,21 @@ class OrderService:
 
     # Update order status and metadata.
     def update_status(
+        # Accept the implicit instance reference.
         self,
+        # Accept the order ID to update.
         order_id: int,
+        # Accept the new status to apply.
         status: str,
+        # Accept optional metadata updates for the order.
         metadata: Optional[Dict[str, Any]] = None,
+        # Close the status update argument list.
     ) -> Optional[OrderRecord]:
         # Describe the status update behavior.
         """Update status for an order."""
         # Reject unknown statuses to keep state transitions valid.
         if status not in ALLOWED_STATUSES:
+            # Raise an error so invalid states do not enter storage.
             raise ValueError(f"Invalid status: {status}")
         # Delegate to storage and return the updated record if found.
         return self._storage.update_order_status(order_id, status, metadata=metadata)
@@ -78,10 +90,12 @@ class OrderService:
             "weekly_delivered": self._storage.delivered_count_since(week_start),
             # Provide the total delivered count for all time.
             "all_time_delivered": self._storage.delivered_count(),
+            # Close the stats dictionary literal.
         }
 
     # Expose the database path for diagnostics.
     @property
+    # Define the database path property accessor.
     def db_path(self) -> str:
         # Describe the database path property.
         """Return the underlying SQLite path."""

@@ -1,15 +1,19 @@
 # Document the purpose of the webapp backend API module.
-"""Webapp backend API scaffold.
-
-Overview: Provides HTTP handlers for orders, staff, and train status.
-Details: Minimal stdlib HTTP server with JSON responses and logging.
-
-Missing info for further development:
-- Inputs: Authentication mechanism, request schemas, user mapping.
-- Outputs: Response schemas and error codes.
-- Actions: MQTT publish/subscribe integration and state persistence.
-- Methods: Authorization rules, rate limits, telemetry ingestion.
-"""
+"""Webapp backend API scaffold."""
+# Summarize what the backend API provides.
+# Overview: Provides HTTP handlers for orders, staff, and train status.
+# Explain how the scaffold behaves.
+# Details: Minimal stdlib HTTP server with JSON responses and logging.
+# Capture open questions for future development.
+# Missing info for further development:
+# Identify required input definitions.
+# - Inputs: Authentication mechanism, request schemas, user mapping.
+# Identify required output schemas.
+# - Outputs: Response schemas and error codes.
+# Identify required operational actions.
+# - Actions: MQTT publish/subscribe integration and state persistence.
+# Identify required implementation methods.
+# - Methods: Authorization rules, rate limits, telemetry ingestion.
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -90,6 +94,7 @@ class ApiHandler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0].rstrip("/")
         # Attempt to serve frontend assets before API routes.
         if self._maybe_serve_frontend(path):
+            # Exit early if a static asset was served.
             return
         # Serve a placeholder train list.
         if path == "/trains":
@@ -97,27 +102,37 @@ class ApiHandler(BaseHTTPRequestHandler):
             payload = {"trains": [{"id": "train-1", "status": "idle"}]}
             # Send the payload as JSON.
             self._send_json(HTTPStatus.OK, payload)
+            # Exit early after serving the trains payload.
             return
         # Serve the staff roster file.
         if path == "/staff":
             # Send the staff roster as JSON.
             self._send_json(HTTPStatus.OK, _load_json(STAFF_FILE, {"staff": []}))
+            # Exit early after serving the staff roster.
             return
         # Serve the weekly leaderboard file.
         if path == "/leaderboard/weekly":
             # Send the weekly leaderboard as JSON.
             self._send_json(
+                # Provide the HTTP status for the weekly leaderboard.
                 HTTPStatus.OK,
+                # Provide the JSON payload for the weekly leaderboard.
                 _load_json(WEEKLY_LEADERBOARD_FILE, {"leaderboard": []}),
+                # Close the send_json call.
             )
+            # Exit early after serving the weekly leaderboard.
             return
         # Serve the all-time leaderboard file.
         if path in ("/leaderboard/all-time", "/leaderboard/all_time"):
             # Send the all-time leaderboard as JSON.
             self._send_json(
+                # Provide the HTTP status for the all-time leaderboard.
                 HTTPStatus.OK,
+                # Provide the JSON payload for the all-time leaderboard.
                 _load_json(ALL_TIME_LEADERBOARD_FILE, {"leaderboard": []}),
+                # Close the send_json call.
             )
+            # Exit early after serving the all-time leaderboard.
             return
         # Serve order history from the order service.
         if path == "/orders":
@@ -127,6 +142,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             history = [record.to_dict() for record in service.get_history()]
             # Send the order history as JSON.
             self._send_json(HTTPStatus.OK, {"orders": history})
+            # Exit early after serving the order history.
             return
         # Serve order stats from the order service.
         if path == "/orders/stats":
@@ -134,6 +150,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             service = self._order_service()
             # Send the stats payload as JSON.
             self._send_json(HTTPStatus.OK, service.get_stats())
+            # Exit early after serving the order stats.
             return
         # Respond with not found for unknown endpoints.
         self._send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
@@ -156,41 +173,55 @@ class ApiHandler(BaseHTTPRequestHandler):
             order = service.create_order(user, metadata)
             # Build the response payload with the expected MQTT topic.
             response = {
+                # Provide the order payload for the response.
                 "order": order.to_dict(),
+                # Provide the MQTT topic that downstream services listen to.
                 "topic": mqtt_topics.ORDER_NEW,
+                # Provide the accepted status string for the client.
                 "status": "accepted",
+                # Close the response dictionary literal.
             }
             # Respond with accepted status.
             self._send_json(HTTPStatus.ACCEPTED, response)
+            # Exit early after accepting the order.
             return
         # Handle order status updates.
         if path == "/orders/status":
             # Read the JSON payload from the request.
             payload = self._read_json()
+            # Attempt to parse the order ID.
             try:
                 # Parse the order ID into an integer.
                 order_id = int(payload.get("order_id", 0))
+            # Handle invalid order ID parsing errors.
             except (TypeError, ValueError):
                 # Reject invalid order IDs.
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_order_id"})
+                # Exit early after rejecting the request.
                 return
             # Extract the new status string.
             status = str(payload.get("status", ""))
             # Extract optional metadata payload.
             metadata = payload.get("metadata")
+            # Attempt to apply the status update.
             try:
                 # Apply the status update using the order service.
                 updated = self._order_service().update_status(order_id, status, metadata)
+            # Handle invalid status values.
             except ValueError:
                 # Reject invalid status values.
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_status"})
+                # Exit early after rejecting the request.
                 return
             # Respond with not found if the order does not exist.
             if updated is None:
+                # Respond with a not-found error for missing orders.
                 self._send_json(HTTPStatus.NOT_FOUND, {"error": "order_not_found"})
+                # Exit early after reporting missing order.
                 return
             # Respond with the updated order payload.
             self._send_json(HTTPStatus.OK, {"order": updated.to_dict()})
+            # Exit early after serving the updated order.
             return
         # Handle staff roster updates.
         if path == "/staff":
@@ -200,7 +231,9 @@ class ApiHandler(BaseHTTPRequestHandler):
             name = str(payload.get("name", "")).strip()
             # Reject empty names.
             if not name:
+                # Reject empty staff names with a bad request response.
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_name"})
+                # Exit early after rejecting the request.
                 return
             # Load the existing roster file.
             roster = _load_json(STAFF_FILE, {"staff": []})
@@ -208,6 +241,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             staff = roster.get("staff", [])
             # Add the name if it is not already present.
             if not any(entry.lower() == name.lower() for entry in staff):
+                # Append the new staff name when it is not already present.
                 staff.append(name)
             # Store the updated staff list.
             roster["staff"] = staff
@@ -215,6 +249,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             _write_json(STAFF_FILE, roster)
             # Respond with the updated roster.
             self._send_json(HTTPStatus.OK, roster)
+            # Exit early after serving the updated roster.
             return
         # Handle leaderboard updates.
         if path == "/leaderboard/record":
@@ -222,15 +257,19 @@ class ApiHandler(BaseHTTPRequestHandler):
             payload = self._read_json()
             # Normalize the user name.
             user = str(payload.get("user", "")).strip()
+            # Attempt to parse the quantity value.
             try:
                 # Parse the quantity into an integer.
                 quantity = int(payload.get("quantity", 0))
+            # Handle invalid quantity parsing errors.
             except (TypeError, ValueError):
                 # Default quantity to zero on parse failure.
                 quantity = 0
             # Reject empty user or non-positive quantity.
             if not user or quantity <= 0:
+                # Reject invalid leaderboard entries with a bad request response.
                 self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid_order"})
+                # Exit early after rejecting the request.
                 return
             # Update the weekly leaderboard data.
             weekly = _update_leaderboard(WEEKLY_LEADERBOARD_FILE, user, quantity)
@@ -238,6 +277,7 @@ class ApiHandler(BaseHTTPRequestHandler):
             all_time = _update_leaderboard(ALL_TIME_LEADERBOARD_FILE, user, quantity)
             # Respond with the updated leaderboards.
             self._send_json(HTTPStatus.OK, {"weekly": weekly, "all_time": all_time})
+            # Exit early after serving leaderboard updates.
             return
         # Respond with not found for unknown endpoints.
         self._send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
@@ -255,11 +295,13 @@ class ApiHandler(BaseHTTPRequestHandler):
             service = getattr(self.server, "order_service", None)
             # Return the service if present.
             if service:
+                # Return the server-provided order service.
                 return service
         # Use the module-level singleton if no server service is set.
         global ORDER_SERVICE
         # Initialize the singleton if needed.
         if ORDER_SERVICE is None:
+            # Instantiate the singleton order service.
             ORDER_SERVICE = build_order_service()
         # Return the cached singleton.
         return ORDER_SERVICE
@@ -268,30 +310,40 @@ class ApiHandler(BaseHTTPRequestHandler):
     def _maybe_serve_frontend(self, path: str) -> bool:
         # Map the root path to the dashboard stub.
         if path in ("", "/"):
+            # Map the root path to the dashboard stub.
             request_path = "dashboard_stub.html"
         # Allow serving image assets from the images path.
         elif path.startswith("/images/"):
+            # Strip the leading slash for image assets.
             request_path = path.lstrip("/")
         # Allow direct requests for the dashboard stub.
         elif path == "/dashboard_stub.html":
+            # Map the explicit dashboard stub request.
             request_path = "dashboard_stub.html"
+        # Handle unknown frontend paths.
         else:
+            # Reject unknown frontend paths.
             return False
 
         # Build the raw path for the requested asset.
         raw_path = FRONTEND_DIR / request_path
         # Reject symlinks to avoid directory traversal.
         if raw_path.is_symlink():
+            # Reject symlinks to prevent traversal.
             return False
         # Resolve the file path to an absolute path.
         file_path = raw_path.resolve()
+        # Attempt to validate the resolved path.
         try:
             # Ensure the resolved path is under the frontend directory.
             file_path.relative_to(FRONTEND_DIR)
+        # Handle invalid paths that escape the frontend directory.
         except ValueError:
+            # Reject paths that escape the frontend directory.
             return False
         # Reject missing or non-file paths.
         if not file_path.exists() or not file_path.is_file():
+            # Reject missing or non-file assets.
             return False
 
         # Guess the content type for the response.
@@ -317,12 +369,15 @@ class ApiHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", "0"))
         # Return an empty payload if no content was provided.
         if length <= 0:
+            # Return an empty payload for empty request bodies.
             return {}
         # Read the raw request body bytes.
         raw = self.rfile.read(length)
+        # Attempt to decode and parse JSON.
         try:
             # Decode and parse the JSON payload.
             return json.loads(raw.decode("utf-8"))
+        # Handle invalid JSON payloads.
         except json.JSONDecodeError:
             # Return an empty payload on parse failure.
             return {}
@@ -345,12 +400,15 @@ class ApiHandler(BaseHTTPRequestHandler):
 
 # Load a JSON file or fall back to defaults.
 def _load_json(path: Path, default: Dict[str, Any]) -> Dict[str, Any]:
+    # Attempt to load JSON from disk.
     try:
         # Read and parse JSON from disk.
         return json.loads(path.read_text(encoding="utf-8"))
+    # Handle missing JSON files.
     except FileNotFoundError:
         # Return defaults if the file does not exist.
         return default
+    # Handle malformed JSON payloads.
     except json.JSONDecodeError:
         # Return defaults if the JSON is malformed.
         return default
@@ -372,16 +430,21 @@ def _update_leaderboard(path: Path, user: str, quantity: int) -> List[Dict[str, 
     leaderboard = data.get("leaderboard", [])
     # Find an existing entry for the user.
     entry = next(
+        # Provide the generator expression that finds a matching user entry.
         (item for item in leaderboard if item.get("name", "").lower() == user.lower()),
+        # Provide the default when no matching entry exists.
         None,
+        # Close the generator call.
     )
     # Update the existing entry if found.
     if entry:
         # Increment the count for the existing user.
         entry["count"] = int(entry.get("count", 0)) + quantity
+    # Handle the case where no entry exists yet.
     else:
         # Append a new entry for the user.
         leaderboard.append({"name": user, "count": quantity})
+    # Sort the leaderboard in descending count order.
     # Sort the leaderboard in descending count order.
     leaderboard.sort(key=lambda item: int(item.get("count", 0)), reverse=True)
     # Store the updated leaderboard back into the payload.
@@ -397,11 +460,17 @@ class OrderHTTPServer(HTTPServer):
     # Describe the OrderHTTPServer class for maintainers.
     """HTTP server that carries a shared OrderService."""
 
+    # Initialize the HTTP server with a shared order service.
     def __init__(
+        # Accept the implicit instance reference.
         self,
+        # Accept the server address tuple.
         server_address: tuple[str, int],
+        # Accept the request handler class.
         RequestHandlerClass: type[BaseHTTPRequestHandler],
+        # Accept the shared order service instance.
         order_service: OrderService,
+        # Close the initializer signature.
     ) -> None:
         # Initialize the base HTTPServer.
         super().__init__(server_address, RequestHandlerClass)
@@ -439,12 +508,15 @@ def main(argv: List[str] | None = None) -> int:
     server = OrderHTTPServer((args.host, args.port), ApiHandler, order_service)
     # Log the server address.
     logging.getLogger("kitt.webapp").info("Serving on http://%s:%s", args.host, args.port)
+    # Attempt to serve requests until interrupted.
     try:
         # Serve requests until interrupted.
         server.serve_forever()
+    # Handle keyboard interrupts to allow graceful shutdown.
     except KeyboardInterrupt:
         # Log the shutdown event.
         logging.getLogger("kitt.webapp").info("Shutting down")
+    # Always close the server socket.
     finally:
         # Close the server socket.
         server.server_close()

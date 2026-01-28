@@ -1,9 +1,9 @@
 # Document the purpose of this unit test module.
-"""Unit tests for MQTT topic helpers.
-
-Overview: Validates MQTT topic constants and formatting helpers.
-Details: Uses unittest to verify template contents and helper formatting.
-"""
+"""Unit tests for MQTT topic helpers."""
+# Summarize what the tests cover.
+# Overview: Validates MQTT topic constants and formatting helpers.
+# Explain how the tests are run.
+# Details: Uses unittest to verify template contents and helper formatting.
 
 # Import unittest for the test framework.
 import unittest
@@ -31,23 +31,35 @@ class TestMqttTopics(unittest.TestCase):
     def test_format_helpers(self) -> None:
         # Verify train location topics format with a train ID.
         self.assertEqual(
+            # Provide the formatted train location topic under test.
             mqtt_topics.train_location_topic("train-9"),
+            # Provide the expected formatted topic value.
             f"{mqtt_topics.BASE}/train/train-9/location",
+            # Close the assertion call.
         )
         # Verify order status topics format with an order ID.
         self.assertEqual(
+            # Provide the formatted order status topic under test.
             mqtt_topics.order_status_topic("order-5"),
+            # Provide the expected formatted topic value.
             f"{mqtt_topics.BASE}/order/order-5/status",
+            # Close the assertion call.
         )
         # Verify sensor health topics format with a sensor ID.
         self.assertEqual(
+            # Provide the formatted sensor health topic under test.
             mqtt_topics.sensor_health_topic("sensor-1"),
+            # Provide the expected formatted topic value.
             f"{mqtt_topics.BASE}/sensor/sensor-1/health",
+            # Close the assertion call.
         )
         # Verify sensor reading topics format with a sensor ID.
         self.assertEqual(
+            # Provide the formatted sensor reading topic under test.
             mqtt_topics.sensor_reading_topic("sensor-1"),
+            # Provide the expected formatted topic value.
             f"{mqtt_topics.BASE}/sensor/sensor-1/reading",
+            # Close the assertion call.
         )
 
     # Confirm the topic template mapping includes expected keys.

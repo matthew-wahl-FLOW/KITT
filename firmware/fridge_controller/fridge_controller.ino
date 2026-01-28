@@ -81,9 +81,17 @@ def compute_dew_point(temp_c, humidity_percent):
 def publish_telemetry(temp_c, humidity_percent, dew_point_c):
     # Write the telemetry line with formatted values.
     uart.write(
+        # Provide the formatted telemetry string for the UART gateway.
         "fridge/telemetry temp_c={:.2f} humidity={:.1f} dewpoint_c={:.2f}\n".format(
-            temp_c, humidity_percent, dew_point_c
-        )
+            # Provide the temperature argument for formatting.
+            temp_c,
+            # Provide the humidity argument for formatting.
+            humidity_percent,
+        # Provide the dew point argument for formatting.
+        dew_point_c,
+        # Close the format call arguments.
+    )
+    # Close the UART write call.
     )
 
 
@@ -105,16 +113,20 @@ def update_cooling(temp_c, dew_point_c):
     global peltier_on, fan_on
     # Enable the peltier when above the target range.
     if temp_c > kTargetTempC + kTempDeadbandC:
+        # Enable the peltier when temperature is above the deadband.
         peltier_on = True
     # Disable the peltier when below the target range.
     elif temp_c < kTargetTempC - kTempDeadbandC:
+        # Disable the peltier when temperature is below the deadband.
         peltier_on = False
 
     # Disable the fan when near dew point to avoid condensation.
     if temp_c - dew_point_c <= kDewpointMarginC:
+        # Disable the fan when too close to the dew point.
         fan_on = False
     # Enable the fan when safely above dew point.
     else:
+        # Enable the fan when safely above the dew point.
         fan_on = True
 
     # Apply the peltier relay output.
@@ -127,15 +139,19 @@ def update_cooling(temp_c, dew_point_c):
 def read_command():
     # Return early if no serial bytes are waiting.
     if not uart.any():
+        # Return None when no serial bytes are waiting.
         return None
     # Read a line of bytes from the UART buffer.
     line = uart.readline()
     # Return early if the read produced no data.
     if not line:
+        # Return None when the UART read returns empty data.
         return None
+    # Attempt to decode the UART line.
     try:
         # Decode bytes into a command string.
         return line.decode().strip()
+    # Handle decode errors from malformed bytes.
     except Exception:
         # Ignore malformed bytes and return no command.
         return None
@@ -147,16 +163,20 @@ def handle_dispense():
     command = read_command()
     # Exit if no command was received.
     if not command:
+        # Exit early when no command is available.
         return
     # Exit if the command is not a dispense request.
     if command != "DISPENSE":
+        # Exit early when the command is not a dispense request.
         return
 
     # Check whether the door is closed before dispensing.
     door_closed = door_sensor.value() == 0
     # Reject the dispense if the door is open.
     if not door_closed:
+        # Publish an error if the door is open.
         publish_status("error_door_open")
+        # Exit early after reporting the error.
         return
 
     # Publish the dispensing status.
@@ -167,9 +187,11 @@ def handle_dispense():
     dispensed = dispense_sensor.value() == 0
     # Publish completion status if the dispense succeeded.
     if dispensed:
+        # Publish the successful dispense status.
         publish_status("done")
     # Publish an error if dispense completion timed out.
     else:
+        # Publish the timeout error status.
         publish_status("error_dispense_timeout")
 
 

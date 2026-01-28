@@ -104,9 +104,11 @@ def start_move(requested_level):
     global target_level
     # Clamp requested levels below zero to the first level.
     if requested_level < 0:
+        # Clamp negative requests to the lowest level.
         requested_level = 0
     # Clamp requested levels above max to the top level.
     elif requested_level >= kMaxLevels:
+        # Clamp oversized requests to the top level index.
         requested_level = kMaxLevels - 1
 
     # Store the target level after clamping.
@@ -115,6 +117,7 @@ def start_move(requested_level):
     if target_level == current_level:
         # Publish a status to indicate no movement is needed.
         publish_status("already_at_level")
+        # Exit early because the elevator is already at the target.
         return
 
     # Start moving upward if the target is higher.
@@ -135,15 +138,19 @@ def start_move(requested_level):
 def read_command():
     # Return early if no serial bytes are waiting.
     if not uart.any():
+        # Return None when no bytes are waiting.
         return None
     # Read a line of bytes from the UART buffer.
     line = uart.readline()
     # Return early if the read produced no data.
     if not line:
+        # Return None when the UART read returns empty data.
         return None
+    # Attempt to decode the UART line.
     try:
         # Decode bytes into a command string.
         return line.decode().strip()
+    # Handle decode errors from malformed bytes.
     except Exception:
         # Ignore malformed bytes and return no command.
         return None
@@ -157,14 +164,17 @@ def handle_command():
     command = read_command()
     # Exit if no command was received.
     if not command:
+        # Exit early when no command is available.
         return
     # Handle numeric level commands prefixed with LEVEL.
     if command.startswith("LEVEL"):
         # Extract the level portion of the command.
         level_text = command[5:].strip()
+        # Attempt to parse the requested level number.
         try:
             # Convert the level text into an integer.
             level = int(level_text)
+        # Default to zero on invalid integer input.
         except ValueError:
             # Default to level zero on parse failure.
             level = 0
@@ -214,6 +224,7 @@ def update_motion():
     global current_level, elevator_state, last_move_ms, last_progress_ms
     # Exit early if the elevator is not moving.
     if elevator_state not in (ELEVATOR_MOVING_UP, ELEVATOR_MOVING_DOWN):
+        # Exit early when the elevator is not moving.
         return
 
     # Read the top limit switch state.
@@ -237,8 +248,11 @@ def update_motion():
     elif has_elapsed(last_move_ms, kLevelTravelMs):
         # Increment or decrement the level based on direction.
         if elevator_state == ELEVATOR_MOVING_UP:
+            # Increment the level while clamping to the top.
             current_level = min(current_level + 1, kMaxLevels - 1)
+        # Handle downward motion between levels.
         else:
+            # Decrement the level while clamping to the bottom.
             current_level = max(current_level - 1, 0)
         # Reset the move timer for the next level.
         last_move_ms = time.ticks_ms()
@@ -253,6 +267,7 @@ def update_motion():
         elevator_state = ELEVATOR_FAULT
         # Publish the stall fault status.
         publish_status("fault_stall")
+        # Exit early after handling the stall fault.
         return
 
     # Stop motion if the target is reached or a limit/timeout triggers.
@@ -265,6 +280,7 @@ def update_motion():
         or hit_bottom
         # Check if the command timed out.
         or has_elapsed(last_move_ms, kCommandTimeoutMs)
+        # Close the stop condition tuple.
     ):
         # Stop the motor output.
         stop_motor()

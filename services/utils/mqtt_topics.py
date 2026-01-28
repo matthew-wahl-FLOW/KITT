@@ -1,15 +1,21 @@
 # Provide module-level documentation for MQTT topic helpers.
-"""MQTT topic helpers.
-
-Overview: Defines MQTT topic constants used across KITT services.
-Details: Provides topic templates and formatter helpers for shared MQTT routing.
-
-Missing info for further development:
-- Inputs: Broker host/port, retained/QoS rules per topic.
-- Outputs: Canonical payload schemas for each topic.
-- Actions: Topic lifecycle (retained cleanup, replay, backfill).
-- Methods: Validation rules for IDs and payload versions.
-"""
+# Start the module docstring for MQTT topic helpers.
+# Define the module docstring for MQTT topic helpers.
+"""MQTT topic helpers."""
+# Summarize what the MQTT topic module provides.
+# Overview: Defines MQTT topic constants used across KITT services.
+# Explain how the module supports shared routing.
+# Details: Provides topic templates and formatter helpers for shared MQTT routing.
+# Capture open questions for future development.
+# Missing info for further development:
+# Identify required broker configuration inputs.
+# - Inputs: Broker host/port, retained/QoS rules per topic.
+# Identify required payload schema outputs.
+# - Outputs: Canonical payload schemas for each topic.
+# Identify required topic lifecycle actions.
+# - Actions: Topic lifecycle (retained cleanup, replay, backfill).
+# Identify required validation methods.
+# - Methods: Validation rules for IDs and payload versions.
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -66,6 +72,7 @@ ALL_TOPICS = (
     JMRI_COMMAND,
     # Include the JMRI event template in the known list.
     JMRI_EVENT,
+    # Close the tuple of known topics.
 )
 
 
@@ -175,6 +182,7 @@ def topic_templates() -> Dict[str, str]:
         "JMRI_COMMAND": JMRI_COMMAND,
         # Expose the JMRI event template.
         "JMRI_EVENT": JMRI_EVENT,
+        # Close the topic template mapping literal.
     }
 
 
@@ -226,4 +234,5 @@ __all__ = [
     "jmri_event_topic",
     # Publish the helper that returns all templates.
     "topic_templates",
+    # Close the __all__ export list.
 ]

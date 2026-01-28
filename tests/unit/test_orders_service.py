@@ -77,8 +77,11 @@ class TestOrderService(unittest.TestCase):
         with sqlite3.connect(self.db_path) as conn:
             # Apply the timestamp update in SQLite.
             conn.execute(
+                # Provide the SQL update statement for the timestamp.
                 "UPDATE orders SET timestamp = ? WHERE id = ?",
+                # Provide the parameters for the timestamp update.
                 (past_time.isoformat(), order.order_id),
+                # Close the SQL execute call.
             )
             # Commit the update so it persists.
             conn.commit()

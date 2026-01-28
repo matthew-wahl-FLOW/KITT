@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 # Use env to locate the system's Python 3 interpreter when run as a script.
-"""Train orchestrator service.
-
-Overview: Coordinates train movement requests and publishes command intents.
-Details: Placeholder CLI service with logging for order/sensor events and routing.
-
-Missing info for further development:
-- Inputs: Order payload schema, sensor event schema, layout topology data.
-- Outputs: Command payload schema for JMRI, telemetry payloads for UI.
-- Actions: Route reservation lifecycle, lock acquisition, conflict resolution.
-- Methods: State storage strategy, retry/backoff rules, safety interlocks.
-"""
+# Start the module docstring for the train orchestrator.
+"""Train orchestrator service."""
+# Summarize what the orchestrator provides.
+# Overview: Coordinates train movement requests and publishes command intents.
+# Explain how the scaffold behaves.
+# Details: Placeholder CLI service with logging for order/sensor events and routing.
+# Capture open questions for future development.
+# Missing info for further development:
+# Identify required input schemas.
+# - Inputs: Order payload schema, sensor event schema, layout topology data.
+# Identify required output schemas.
+# - Outputs: Command payload schema for JMRI, telemetry payloads for UI.
+# Identify required operational actions.
+# - Actions: Route reservation lifecycle, lock acquisition, conflict resolution.
+# Identify required implementation methods.
+# - Methods: State storage strategy, retry/backoff rules, safety interlocks.
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -71,16 +76,25 @@ class TrainOrchestrator:
         self._reservations[order_id] = reservation
         # Log the receipt of the order with the expected MQTT topic.
         self.logger.info(
+            # Provide the log format string for the order receipt.
             "Order received: order_id=%s siding=%s train_id=%s topic=%s",
+            # Provide the order ID argument for the log.
             order_id,
+            # Provide the siding argument for the log.
             siding,
+            # Provide the train ID argument for the log.
             train_id,
+            # Provide the MQTT topic argument for the log.
             mqtt_topics.ORDER_NEW,
+            # Close the logger call.
         )
         # Log where a dispatch command would be published for JMRI.
         self.logger.info(
+            # Provide the log format string for dispatch publishing.
             "Publishing JMRI command placeholder on %s",
+            # Provide the MQTT topic argument for dispatch.
             mqtt_topics.jmri_command_topic("dispatch"),
+            # Close the logger call.
         )
         # Return the reservation so callers can inspect it.
         return reservation
@@ -91,10 +105,15 @@ class TrainOrchestrator:
         """Log a placeholder sensor update."""
         # Log the sensor update and the normalized state topic.
         self.logger.info(
+            # Provide the log format string for sensor updates.
             "Sensor update: sensor_id=%s state=%s topic=%s",
+            # Provide the sensor ID argument for the log.
             sensor_id,
+            # Provide the sensor state argument for the log.
             state,
+            # Provide the MQTT topic argument for the log.
             mqtt_topics.sensor_state_topic(sensor_id),
+            # Close the logger call.
         )
 
     # Provide a snapshot of current reservations.

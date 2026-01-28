@@ -1,9 +1,11 @@
 # Document the purpose of the order domain model module.
-"""Order domain models.
-
-Overview: Defines order status values and the order record schema.
-Details: Dataclasses are used for clean serialization between layers.
-"""
+# Provide the module docstring for order domain models.
+# Start the module docstring for order domain models.
+"""Order domain models."""
+# Summarize what the order models provide.
+# Overview: Defines order status values and the order record schema.
+# Explain why dataclasses are used in this module.
+# Details: Dataclasses are used for clean serialization between layers.
 
 # Enable postponed evaluation for type hints to keep annotations simple.
 from __future__ import annotations
@@ -56,6 +58,7 @@ class OrderRecord:
             "status": self.status,
             # Provide metadata for any extra order context.
             "metadata": self.metadata,
+            # Close out the dictionary literal.
         }
 
 

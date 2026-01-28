@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 # Use env to locate the system's Python 3 interpreter when run as a script.
 # Provide module-level documentation for the sensor gateway.
-"""Sensor gateway service.
-
-Overview: Normalizes sensor events into standard MQTT topics.
-Details: Placeholder gateway that logs normalization output.
-
-Missing info for further development:
-- Inputs: Raw sensor payload formats, validation rules.
-- Outputs: Normalized payload schema and health status fields.
-- Actions: Health check cadence and offline policy.
-- Methods: MQTT subscription list and message acknowledgement behavior.
-"""
+# Start the module docstring for the sensor gateway.
+"""Sensor gateway service."""
+# Summarize what the sensor gateway provides.
+# Overview: Normalizes sensor events into standard MQTT topics.
+# Explain how the scaffold behaves.
+# Details: Placeholder gateway that logs normalization output.
+# Capture open questions for future development.
+# Missing info for further development:
+# Identify required input definitions.
+# - Inputs: Raw sensor payload formats, validation rules.
+# Identify required output schemas.
+# - Outputs: Normalized payload schema and health status fields.
+# Identify required operational actions.
+# - Actions: Health check cadence and offline policy.
+# Identify required implementation methods.
+# - Methods: MQTT subscription list and message acknowledgement behavior.
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -76,6 +81,7 @@ class SensorGateway:
             message.value,
             # Provide the topic argument for the log.
             topic,
+            # Close the logger call.
         )
 
     # Publish a placeholder health status.
@@ -129,6 +135,7 @@ def main(argv: List[str] | None = None) -> int:
         sensor_type=args.sensor_type,
         # Use the CLI-provided sensor value.
         value=args.value,
+        # Close the sensor message constructor.
     )
     # Normalize a placeholder sensor message.
     gateway.normalize(message)

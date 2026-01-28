@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 # Use env to locate the system's Python 3 interpreter when run as a script.
-"""Pi dashboard display scaffold.
-
-Overview: Streams live sensor readouts and MQTT chatter to a lightweight UI payload.
-Details: Simulates MQTT updates and prints display-ready JSON lines for a Pi renderer.
-
-Missing info for further development:
-- Inputs: MQTT broker credentials, sensor catalog, UI endpoint location.
-- Outputs: Websocket or HTTP push payload schema for the display.
-- Actions: Reconnect/backoff policy and persistence strategy.
-- Methods: Rendering stack (Chromium kiosk, frame buffer, or HDMI).
-"""
+# Start the module docstring for the display dashboard.
+"""Pi dashboard display scaffold."""
+# Summarize what the display dashboard provides.
+# Overview: Streams live sensor readouts and MQTT chatter to a lightweight UI payload.
+# Explain how the scaffold operates.
+# Details: Simulates MQTT updates and prints display-ready JSON lines for a Pi renderer.
+# Capture open questions for future development.
+# Missing info for further development:
+# Identify configuration inputs that are still required.
+# - Inputs: MQTT broker credentials, sensor catalog, UI endpoint location.
+# Identify display payload outputs that are still required.
+# - Outputs: Websocket or HTTP push payload schema for the display.
+# Identify operational actions that are still required.
+# - Actions: Reconnect/backoff policy and persistence strategy.
+# Identify implementation methods that are still required.
+# - Methods: Rendering stack (Chromium kiosk, frame buffer, or HDMI).
 
 # Enable postponed evaluation so annotations can use forward references.
 from __future__ import annotations
@@ -101,19 +106,28 @@ class DisplayDashboard:
         self._readings.insert(0, reading)
         # Log the update with the normalized MQTT topic.
         self.logger.info(
+            # Provide the log format string for sensor readings.
             "Sensor reading sensor_id=%s value=%s topic=%s",
+            # Provide the sensor ID argument for the log.
             sensor_id,
+            # Provide the sensor value argument for the log.
             value,
+            # Provide the MQTT topic argument for the log.
             mqtt_topics.sensor_reading_topic(sensor_id),
+            # Close the logger call.
         )
 
     # Add a chatter message to the feed.
     def add_chatter(self, topic: str, payload: str) -> None:
         # Build a chatter message with a timestamp.
         message = MqttMessage(
+            # Provide the topic for the chatter message.
             topic=topic,
+            # Provide the payload text for the chatter message.
             payload=payload,
+            # Provide the timestamp for the chatter message.
             timestamp=datetime.now(timezone.utc).isoformat(),
+            # Close the chatter message constructor.
         )
         # Prepend the chatter item and keep only the latest entries.
         self._chatter.insert(0, message)
@@ -134,6 +148,7 @@ class DisplayDashboard:
             "sensors": [asdict(reading) for reading in self._readings],
             # Include the recent MQTT chatter messages.
             "chatter": [asdict(message) for message in self._chatter],
+            # Close the payload dictionary literal.
         }
 
 
@@ -169,13 +184,19 @@ def simulate_cycle(display: DisplayDashboard) -> None:
     display.update_reading("lift-state", lift_state)
     # Emit chatter messages as if MQTT updates arrived.
     display.add_chatter(
+        # Provide the MQTT topic for fridge temperature readings.
         mqtt_topics.sensor_reading_topic("fridge-temp"),
+        # Provide the JSON payload for the temperature reading.
         json.dumps({"temp_c": temp_c}),
+        # Close the chatter call.
     )
     # Emit chatter messages as if MQTT updates arrived.
     display.add_chatter(
+        # Provide the MQTT topic for fridge humidity readings.
         mqtt_topics.sensor_reading_topic("fridge-humidity"),
+        # Provide the JSON payload for the humidity reading.
         json.dumps({"humidity": humidity}),
+        # Close the chatter call.
     )
     # Emit chatter messages as if MQTT updates arrived.
     display.add_chatter("kitt/lift/state", json.dumps({"state": lift_state}))

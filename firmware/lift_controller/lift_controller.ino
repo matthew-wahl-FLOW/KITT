@@ -94,15 +94,19 @@ def stop_lift():
 def read_command():
     # Return early if no serial bytes are waiting.
     if not uart.any():
+        # Return None when no serial bytes are waiting.
         return None
     # Read a line of bytes from the UART buffer.
     line = uart.readline()
     # Return early if the read produced no data.
     if not line:
+        # Return None when the UART read returns empty data.
         return None
+    # Attempt to decode the UART line.
     try:
         # Decode bytes into a command string.
         return line.decode().strip()
+    # Handle decode errors from malformed bytes.
     except Exception:
         # Ignore malformed bytes and return no command.
         return None
@@ -116,6 +120,7 @@ def handle_command():
     command = read_command()
     # Exit if no command was received.
     if not command:
+        # Exit early when no command is available.
         return
     # Handle the LOWER command sequence.
     if command == "LOWER":
@@ -192,6 +197,7 @@ def update_lift():
         lift_start_ms,
         # Provide the maximum travel time allowed.
         kLiftTravelMs,
+        # Close the elapsed-time argument list.
     ):
         # Stop the motor after timeout.
         stop_lift()
