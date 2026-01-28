@@ -1,7 +1,4 @@
 # Document the purpose of the SQLite order storage module.
-# Provide module-level documentation for order storage.
-# Start the module docstring for order storage.
-# Define the module docstring content for order storage.
 """SQLite storage for order persistence."""
 # Summarize what the storage module provides.
 # Overview: Encapsulates SQLite access for creating and querying orders.
@@ -33,25 +30,25 @@ DEFAULT_DB_PATH = Path(__file__).resolve().parents[1] / "data" / "orders.db"
 # Define the SQLite schema for order storage and indexing.
 # Start the multi-line schema string for SQLite.
 SCHEMA_SQL = (
-    # Define the SQL for creating the orders table.
+    # Create the orders table if it does not exist yet.
     "CREATE TABLE IF NOT EXISTS orders ("
-    # Define the order ID column as an auto-incrementing primary key.
+    # Store the order ID as an auto-incrementing primary key.
     "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-    # Define the order timestamp column.
+    # Store the order timestamp as an ISO string.
     "timestamp TEXT NOT NULL, "
-    # Define the user ID column.
+    # Store the user identifier for who placed the order.
     "user_id TEXT NOT NULL, "
-    # Define the status column.
+    # Store the order status for orchestration.
     "status TEXT NOT NULL, "
-    # Define the metadata column.
+    # Store order metadata as JSON text.
     "metadata TEXT NOT NULL"
     # Close the table definition.
     ");"
-    # Define the SQL for the status index.
+    # Create an index on status for quick status queries.
     "CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);"
-    # Define the SQL for the timestamp index.
+    # Create an index on timestamp for recent history queries.
     "CREATE INDEX IF NOT EXISTS idx_orders_timestamp ON orders(timestamp);"
-    # Close the schema SQL string group.
+    # Close the schema SQL tuple.
 )
 
 
@@ -275,13 +272,7 @@ class OrderStorage:
             # Fetch all rows from the result set.
             rows = cursor.fetchall()
         # Convert each row into an OrderRecord for callers.
-        return [
-            # Convert each row into an OrderRecord using the helper.
-            self._row_to_record(row)
-            # Iterate over each row from the query.
-            for row in rows
-            # Close the list comprehension.
-        ]
+        return [self._row_to_record(row) for row in rows]
 
     # Convert a SQLite row into an OrderRecord.
     @staticmethod

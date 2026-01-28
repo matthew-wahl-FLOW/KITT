@@ -1,6 +1,4 @@
 # Provide module-level documentation for MQTT topic helpers.
-# Start the module docstring for MQTT topic helpers.
-# Define the module docstring for MQTT topic helpers.
 """MQTT topic helpers."""
 # Summarize what the MQTT topic module provides.
 # Overview: Defines MQTT topic constants used across KITT services.

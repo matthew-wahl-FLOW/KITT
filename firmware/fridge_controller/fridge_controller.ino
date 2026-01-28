@@ -87,11 +87,11 @@ def publish_telemetry(temp_c, humidity_percent, dew_point_c):
             temp_c,
             # Provide the humidity argument for formatting.
             humidity_percent,
-        # Provide the dew point argument for formatting.
-        dew_point_c,
-        # Close the format call arguments.
-    )
-    # Close the UART write call.
+            # Provide the dew point argument for formatting.
+            dew_point_c,
+            # Close the format call arguments.
+        )
+        # Close the UART write call.
     )
 
 

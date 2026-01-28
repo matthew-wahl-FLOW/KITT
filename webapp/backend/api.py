@@ -445,7 +445,6 @@ def _update_leaderboard(path: Path, user: str, quantity: int) -> List[Dict[str, 
         # Append a new entry for the user.
         leaderboard.append({"name": user, "count": quantity})
     # Sort the leaderboard in descending count order.
-    # Sort the leaderboard in descending count order.
     leaderboard.sort(key=lambda item: int(item.get("count", 0)), reverse=True)
     # Store the updated leaderboard back into the payload.
     data["leaderboard"] = leaderboard

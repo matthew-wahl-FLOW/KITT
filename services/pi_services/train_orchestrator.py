@@ -76,23 +76,23 @@ class TrainOrchestrator:
         self._reservations[order_id] = reservation
         # Log the receipt of the order with the expected MQTT topic.
         self.logger.info(
-            # Provide the log format string for the order receipt.
+            # Log the order receipt and target metadata.
             "Order received: order_id=%s siding=%s train_id=%s topic=%s",
-            # Provide the order ID argument for the log.
+            # Include the order identifier.
             order_id,
-            # Provide the siding argument for the log.
+            # Include the siding identifier.
             siding,
-            # Provide the train ID argument for the log.
+            # Include the train identifier.
             train_id,
-            # Provide the MQTT topic argument for the log.
+            # Include the MQTT topic name.
             mqtt_topics.ORDER_NEW,
             # Close the logger call.
         )
         # Log where a dispatch command would be published for JMRI.
         self.logger.info(
-            # Provide the log format string for dispatch publishing.
+            # Log the JMRI dispatch topic placeholder.
             "Publishing JMRI command placeholder on %s",
-            # Provide the MQTT topic argument for dispatch.
+            # Include the dispatch topic name.
             mqtt_topics.jmri_command_topic("dispatch"),
             # Close the logger call.
         )
@@ -105,13 +105,13 @@ class TrainOrchestrator:
         """Log a placeholder sensor update."""
         # Log the sensor update and the normalized state topic.
         self.logger.info(
-            # Provide the log format string for sensor updates.
+            # Log the sensor update and normalized topic.
             "Sensor update: sensor_id=%s state=%s topic=%s",
-            # Provide the sensor ID argument for the log.
+            # Include the sensor identifier.
             sensor_id,
-            # Provide the sensor state argument for the log.
+            # Include the sensor state value.
             state,
-            # Provide the MQTT topic argument for the log.
+            # Include the normalized MQTT topic.
             mqtt_topics.sensor_state_topic(sensor_id),
             # Close the logger call.
         )
