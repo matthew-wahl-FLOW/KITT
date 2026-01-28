@@ -170,7 +170,7 @@ runtime services (JMRI, Python orchestration, MQTT, and supporting hardware inte
   - **Runs**: `/opt/jmri/PanelPro --no-splash --profile KITT` (or custom script).
   - **Dependencies**: `kitt-mqtt.service`, network‑online.
   - **Healthy**: JSON/WebSocket endpoints reachable, logs show profile loaded.
-- `orchestrator.service`
+- `kitt-orchestrator.service`
   - **Purpose**: Python orchestration layer.
   - **Runs**: Python entry point under `/opt/kitt/src/orchestrator` (to be set).
   - **Dependencies**: `kitt-mqtt.service`.
@@ -178,7 +178,7 @@ runtime services (JMRI, Python orchestration, MQTT, and supporting hardware inte
 - `kitt-health.service`
   - **Purpose**: Health/heartbeat publisher.
   - **Runs**: Python health module (to be set).
-  - **Dependencies**: orchestrator.
+  - **Dependencies**: `kitt-orchestrator.service`.
   - **Healthy**: retained health payload published at interval.
 - `kitt-camera.service`
   - **Purpose**: Optional camera streaming process.
@@ -253,7 +253,7 @@ runtime services (JMRI, Python orchestration, MQTT, and supporting hardware inte
   - Restart specific services in dependency order:
     - `sudo systemctl restart kitt-mqtt.service`
     - `sudo systemctl restart kitt-jmri.service`
-    - `sudo systemctl restart orchestrator.service`
+    - `sudo systemctl restart kitt-orchestrator.service`
     - `sudo systemctl restart kitt-health.service`
 
 **Risks / Assumptions**:
