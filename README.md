@@ -81,6 +81,41 @@ services/    — Raspberry Pi orchestration and support services
 tests/       — Simulation, validation, and safety tests
 webapp/      — User interface and monitoring components
 
+## EX‑CSB1 / EX‑RAIL Production Skeleton
+
+The minimal EX‑RAIL configuration for the command station lives in `kitt/ex-csb1/`:
+
+- `myAutomation.ino` — deterministic EX‑RAIL macros (blocks, turnouts, routes, automations).
+- `myConfig.h` — conservative command station configuration (no Wi‑Fi, offline‑first, safe boot).
+
+### What Belongs in EX‑RAIL
+
+- Real‑time, deterministic safety interlocks (block reservations, turnout alignment).
+- Minimal routes/automations that must execute even if the Pi is offline.
+- Safe defaults at boot (track power off until manually enabled).
+
+### What Does NOT Belong in EX‑RAIL
+
+- High‑level business logic, order workflows, or user intent sequencing.
+- Networking, MQTT, database access, or Raspberry Pi service dependencies.
+- Anything that can tolerate latency or requires external confirmation.
+
+### Deployment (Compile + Flash)
+
+This skeleton targets the current CommandStation‑EX production release (v5.x); adjust for older
+releases as needed (e.g., power‑on behavior or file naming).
+
+1. Copy `kitt/ex-csb1/myConfig.h` to `config.h` in the CommandStation‑EX sketch folder.
+2. Copy `kitt/ex-csb1/myAutomation.ino` to `myAutomation.h` in the same folder.
+3. Build and flash using the Arduino IDE or the EX‑Installer (recommended by DCC‑EX).
+
+### Relationship to Raspberry Pi / JMRI
+
+- EX‑RAIL is authoritative for real‑time track safety and motion.
+- JMRI and Pi services provide orchestration and UI, but must assume the command station
+  can run safely without them.
+- EX‑RAIL scripts must remain deterministic and safe even when the Pi is offline.
+
 ### Key Directories Explained
 
 #### `deploy/`
