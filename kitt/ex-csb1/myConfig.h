@@ -10,6 +10,10 @@
 // Automation in myAutomation.ino also starts with POWEROFF.
 #define STARTUP_DELAY 3000
 
+// Reserve EX-RAIL table memory for the block/route/automation scaffold.
+// Increase only if additional EX-RAIL macros are added and memory allows.
+#define EXRAIL_STACK 900
+
 // Disable WiFi/Ethernet to keep the command station offline-first and deterministic.
 #define ENABLE_WIFI false
 #define ENABLE_ETHERNET false

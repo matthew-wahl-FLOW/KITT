@@ -94,6 +94,23 @@ The minimal EX‑RAIL configuration for the command station lives in `kitt/ex-cs
 - Minimal routes/automations that must execute even if the Pi is offline.
 - Safe defaults at boot (track power off until manually enabled).
 
+### Current EX‑RAIL Layout Scaffold
+
+The EX‑RAIL skeleton ships with deterministic IDs that mirror the KITT layout scaffold and can be
+edited as the physical topology is finalized:
+
+- **Blocks**: `1` main loop, `2` staging siding, `3` delivery spur.
+- **Sensors (VPINs)**: `40` loop exit, `41` staging exit, `42` delivery exit.
+- **Turnouts (DCC accessory)**: `1` addr 100 (mainline → service siding), `2` addr 101 (service siding → delivery spur).
+- **Routes**:
+  - `1` main loop (close 1, close 2).
+  - `2` staging siding (throw 1, close 2).
+  - `3` delivery spur (throw 1, throw 2).
+- **Automations**:
+  - `10` reserve main loop, set route 1, release after loop exit.
+  - `20` reserve main loop + staging, set route 2, release after staging exit.
+  - `30` reserve main loop + delivery, set route 3, release after delivery exit.
+
 ### What Does NOT Belong in EX‑RAIL
 
 - High‑level business logic, order workflows, or user intent sequencing.
