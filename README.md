@@ -101,7 +101,7 @@ edited as the physical topology is finalized:
 
 - **Blocks**: `1` main loop, `2` staging siding, `3` delivery spur.
 - **Sensors (VPINs)**: `40` loop exit, `41` staging exit, `42` delivery exit.
-- **Turnouts (DCC accessory)**: `1` addr 100 (mainline → service siding), `2` addr 101 (service siding → delivery spur).
+- **Turnouts (DCC accessory)**: `1` addr 100 (main loop → staging siding), `2` addr 101 (staging siding → delivery spur).
 - **Routes**:
   - `1` main loop (close 1, close 2).
   - `2` staging siding (throw 1, close 2).

@@ -23,8 +23,8 @@ ALIAS(SENSOR_DELIVERY_EXIT, 42)
 // Turnouts are declared so routes can set safe paths.
 // First parameter is the EX-RAIL turnout ID; addr/subaddr are DCC accessory addresses.
 
-TURNOUT(1, 100, 0, "Mainline to service siding")
-TURNOUT(2, 101, 0, "Service siding to delivery spur")
+TURNOUT(1, 100, 0, "Main loop to staging siding")
+TURNOUT(2, 101, 0, "Staging siding to delivery spur")
 
 // ---- Routes ------------------------------------------------------------------
 // Routes are reusable, deterministic turnout alignments.
