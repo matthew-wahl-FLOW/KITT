@@ -47,6 +47,31 @@ ROUTE(3, "Route: Delivery spur")
   THROW(2)
 DONE
 
+// myAutomation.h — First automation test for loco 6313
+// Optional manual trigger from Engine Driver / WiThrottle
+ROUTE(101, "Noon Test (6313)")
+  SENDLOCO(6313, 201)      // run sequence 201 on loco 6313
+DONE
+
+// The work sequence (lights + bell, horn×3, run 30 s at speed 25)
+SEQUENCE(201)
+  SETLOCO(6313)            // select loco
+
+  // Lights (F0) and bell (F1) on
+  FON(0)
+  FON(1)
+  DELAY(1500)
+
+  // Horn (F2) three short blasts
+  FON(2); DELAY(400); FOFF(2);
+  DELAY(300);
+  FON(2); DELAY(400); FOFF(2);
+  DELAY(300);
+  FON(2); DELAY(400); FOFF(2);
+
+  // (Optional) stop the bell before moving; comment out to keep bell ringing
+  FOFF(1)
+
 // ---- Automation --------------------------------------------------------------
 // Automations should only coordinate safe movement on the command station.
 // They must not depend on Pi services or network messages.
@@ -84,5 +109,5 @@ DONE
 // Startup keeps the track safe and predictable. Leave power off until manually enabled.
 
 AUTOSTART
-POWEROFF
+// POWEROFF
 DONE
