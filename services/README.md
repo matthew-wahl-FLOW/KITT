@@ -46,6 +46,8 @@ microcontrollers, and JMRI.
 - `pi_services/sensor_gateway.py` - Sensor normalization scaffold.
 - `pi_services/loadcell_monitor.py` - Load cell monitoring scaffold.
 - `pi_services/display_dashboard.py` - Pi display dashboard scaffold.
+- `pi_services/rfid_bridge.py` - RFID reader bridge (Mega USB serial to JMRI memory and sensor).
+  See `jmri/rfid_reader_setup.md`.
 
 ## Running Locally
 Each module can be executed directly:

@@ -16,6 +16,12 @@
 # CSI/USB Camera (example):
 # SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="0825", SYMLINK+="kitt/cam0", MODE="0660", GROUP="video"
 #
+# RFID reader Mega (Keystudio clone, CH340 chip 1a86:7523). The CSB1 example above uses the
+# same chip, so match on the board's serial number to avoid both devices getting one name:
+#   udevadm info -a -n /dev/ttyUSB0 | grep '{serial}' | head -1
+# Replace REPLACE_WITH_MEGA_SERIAL, then uncomment:
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", ATTRS{serial}=="REPLACE_WITH_MEGA_SERIAL", SYMLINK+="kitt/rfid0", MODE="0660", GROUP="dialout"
+#
 # After editing:
 #   sudo udevadm control --reload
 #   sudo udevadm trigger
